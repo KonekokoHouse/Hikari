@@ -31,8 +31,8 @@ public class ModuleComponent implements IComponent {
     private boolean bindingKey;
     private float lastBindListenX, lastBindListenY, lastBindListenW, lastBindListenH;
 
-    private final Animation bgAnimation = new Animation(Easing.ISLAND_OUT, 1000L);
-    private final Animation exitAnimation = new Animation(Easing.ISLAND_OUT, 1000L);
+    private final Animation bgAnimation = new Animation(Easing.EASE_OUT_EXPO, 450L);
+    private final Animation exitAnimation = new Animation(Easing.EASE_OUT_EXPO, 450L);
     private float sourceX, sourceY, sourceW, sourceH;
     private float targetCardX, targetCardY, targetCardW, targetCardH;
     private float exitStartX, exitStartY, exitStartW, exitStartH;
@@ -137,7 +137,30 @@ public class ModuleComponent implements IComponent {
         }
 
         if (animW > 0.5f && animH > 0.5f) {
-            set.bottomRoundRect().addRoundRect(animX, animY, animW, animH, animRadius, new Color(25, 25, 25, (int) (140 * progress)));
+            set.bottomRoundRect().addRoundRect(animX, animY, animW, animH, animRadius, new Color(25, 25, 25, 140));
+        }
+
+        if (progress < 0.99f) {
+            float oldContentAlpha = 1.0f - progress;
+            int oldAlphaInt = (int) (255 * oldContentAlpha);
+
+            float centerX = animX + animW / 2.0f;
+            float centerY = animY + animH / 2.0f;
+
+            float oldNameScale = 1.1f * guiScale;
+            float oldDescScale = 0.62f * guiScale;
+
+            float oldNameW = set.font().getWidth(module.getName(), oldNameScale);
+            float oldDescW = set.font().getWidth(module.getDescription(), oldDescScale);
+
+            float oldNameH = set.font().getHeight(oldNameScale);
+            float oldDescH = set.font().getHeight(oldDescScale);
+            float oldBlockH = oldNameH + 3 * guiScale + oldDescH;
+
+            float oldStartY = centerY - oldBlockH / 2.0f;
+
+            set.font().addText(module.getName(), centerX - oldNameW / 2.0f, oldStartY - 0.6f * guiScale, oldNameScale, new Color(255, 255, 255, oldAlphaInt));
+            set.font().addText(module.getDescription(), centerX - oldDescW / 2.0f, oldStartY + oldNameH + 3 * guiScale - 0.2f * guiScale, oldDescScale, new Color(200, 200, 200, oldAlphaInt));
         }
 
         if (progress <= 0.01f) return;
@@ -149,7 +172,7 @@ public class ModuleComponent implements IComponent {
         Color selectedBgColor = new Color(255, 255, 255, (int) (26 * progress));
         Color dividerColor = new Color(255, 255, 255, (int) (14 * progress));
 
-        float titleScale = 1.15f * guiScale;
+        float titleScale = 1.15f * guiScale * (0.5f + 0.5f * progress);
         float titleY = animY + padding - guiScale;
         set.font().addText(module.getName(), animX + padding, titleY, titleScale, textColor);
 

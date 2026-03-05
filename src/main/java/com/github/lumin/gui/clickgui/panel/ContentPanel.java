@@ -36,7 +36,7 @@ public class ContentPanel implements IComponent {
     private float height;
     private Category currentCategory;
 
-    private final Animation viewAnimation = new Animation(Easing.EASE_OUT_QUAD, 150L);
+    private final Animation viewAnimation = new Animation(Easing.EASE_OUT_EXPO, 450L);
     private float sourceCardX, sourceCardY, sourceCardW, sourceCardH;
     private boolean closeSettingsRequested;
     private boolean exitAnimationStarted;
@@ -300,6 +300,8 @@ public class ContentPanel implements IComponent {
 
         float listBottom = this.y + this.height * guiScale - padding;
         int visibleIndex = 0;
+        Module expandingModule = settingsComponent != null ? settingsComponent.getModule() : null;
+
         for (ModuleCard card : moduleCards) {
             boolean matchesSearch = listSearchText.isEmpty() || card.module.getName().toLowerCase().startsWith(listSearchText.toLowerCase());
             card.updateVisibility(matchesSearch);
@@ -315,7 +317,9 @@ public class ContentPanel implements IComponent {
             card.width = cardWidth;
             card.height = cardHeight;
             if (card.shouldRender() && card.y + cardHeight >= lastListY && card.y <= listBottom) {
-                card.render(listRoundRect, listFont, mouseX, mouseY, guiScale, alpha);
+                if (expandingModule != card.module || currentState == 0) {
+                    card.render(listRoundRect, listFont, mouseX, mouseY, guiScale, alpha);
+                }
             }
             visibleIndex++;
         }
@@ -775,6 +779,7 @@ public class ContentPanel implements IComponent {
         if (currentState == 2) {
             viewAnimation.run(1.0f);
             if (viewAnimation.getValue() >= 0.99f) currentState = 1;
+            renderListView(set, mouseX, mouseY, deltaTicks, alpha);
             renderSettingsView(set, mouseX, mouseY, deltaTicks, alpha);
         } else if (currentState == 3) {
             closeSettingsRequested = true;
