@@ -36,13 +36,13 @@ public class StringSettingComponent extends Component {
         focusAnimation.run(target);
         float t = Mth.clamp(focusAnimation.getValue(), 0.0f, 1.0f);
         int bgAlpha = (int) Mth.lerp(t, 10.0f, 22.0f);
-        Color bg = new Color(255, 255, 255, (int)(Mth.clamp(bgAlpha, 0, 255) * alpha));
+        Color bg = new Color(255, 255, 255, (int) (Mth.clamp(bgAlpha, 0, 255) * alpha));
         set.bottomRoundRect().addRoundRect(getX(), getY(), getWidth(), getHeight(), 6.0f * scale, bg);
 
         String name = setting.getDisplayName();
         float textScale = 0.85f * scale;
         float textY = getY() + (getHeight() - set.font().getHeight(textScale)) / 2.0f - 0.5f * scale;
-        set.font().addText(name, getX() + 6.0f * scale, textY, textScale, new Color(255, 255, 255, (int)(255 * alpha)));
+        set.font().addText(name, getX() + 6.0f * scale, textY, textScale, new Color(255, 255, 255, (int) (255 * alpha)));
 
         String value = setting.getValue() == null ? "" : setting.getValue();
         if (focused && (System.currentTimeMillis() % 1000 > 500)) {
@@ -51,7 +51,7 @@ public class StringSettingComponent extends Component {
         float maxValueW = Math.max(0.0f, getWidth() * 0.55f);
         float valueW = Math.min(set.font().getWidth(value, textScale), maxValueW);
         float valueX = getX() + getWidth() - 6.0f * scale - valueW;
-        set.font().addText(value, valueX, textY, textScale, new Color(200, 200, 200, (int)(255 * alpha)));
+        set.font().addText(value, valueX, textY, textScale, new Color(200, 200, 200, (int) (255 * alpha)));
     }
 
     @Override

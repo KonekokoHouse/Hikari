@@ -64,6 +64,35 @@ public class LuminRenderPipelines {
             .withVertexShader(ResourceLocationUtils.getIdentifier("texture"))
             .withFragmentShader(ResourceLocationUtils.getIdentifier("texture"))
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .withDepthWrite(false)
+            .withSampler("Sampler0")
+            .withBlend(BlendFunction.TRANSLUCENT)
+            .withCull(false)
+            .build();
+
+    private final static RenderPipeline.Snippet BLUR_SNIPPET = RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
+            .withUniform("BlurInfo", UniformType.UNIFORM_BUFFER)
+            .buildSnippet();
+
+    public final static RenderPipeline BLUR_DOWN = RenderPipeline.builder(BLUR_SNIPPET)
+            .withLocation(ResourceLocationUtils.getIdentifier("pipelines/blur_down"))
+            .withVertexFormat(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS)
+            .withVertexShader(ResourceLocationUtils.getIdentifier("blur"))
+            .withFragmentShader(ResourceLocationUtils.getIdentifier("blur_down"))
+            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .withDepthWrite(false)
+            .withSampler("Sampler0")
+            .withBlend(BlendFunction.TRANSLUCENT)
+            .withCull(false)
+            .build();
+
+    public final static RenderPipeline BLUR_UP = RenderPipeline.builder(BLUR_SNIPPET)
+            .withLocation(ResourceLocationUtils.getIdentifier("pipelines/blur_up"))
+            .withVertexFormat(DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS)
+            .withVertexShader(ResourceLocationUtils.getIdentifier("blur"))
+            .withFragmentShader(ResourceLocationUtils.getIdentifier("blur_up"))
+            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .withDepthWrite(false)
             .withSampler("Sampler0")
             .withBlend(BlendFunction.TRANSLUCENT)
             .withCull(false)
@@ -75,6 +104,8 @@ public class LuminRenderPipelines {
         event.registerPipeline(LINE);
         event.registerPipeline(ROUND_RECT);
         event.registerPipeline(TEXTURE);
+        event.registerPipeline(BLUR_DOWN);
+        event.registerPipeline(BLUR_UP);
     }
 
 }

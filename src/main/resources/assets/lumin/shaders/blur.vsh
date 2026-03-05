@@ -1,12 +1,14 @@
-#version 150
+#version 410 core
 
-out vec2 vUv;
+#moj_import <minecraft:dynamictransforms.glsl>
+#moj_import <minecraft:projection.glsl>
+
+layout(location = 0) in vec3 Position;
+layout(location = 1) in vec2 UV0;
+
+out vec2 v_TexCoord;
 
 void main() {
-    vec2 pos;
-    if (gl_VertexID == 0) pos = vec2(-1.0, -1.0);
-    else if (gl_VertexID == 1) pos = vec2(3.0, -1.0);
-    else pos = vec2(-1.0, 3.0);
-    vUv = pos * 0.5 + 0.5;
-    gl_Position = vec4(pos, 0.0, 1.0);
+    gl_Position = ProjMat * ModelViewMat * vec4(Position, 1.0);
+    v_TexCoord = UV0;
 }

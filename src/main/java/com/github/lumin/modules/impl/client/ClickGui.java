@@ -4,11 +4,8 @@ import com.github.lumin.gui.clickgui.ClickGuiScreen;
 import com.github.lumin.modules.Category;
 import com.github.lumin.modules.Module;
 import com.github.lumin.settings.impl.BoolSetting;
-import com.github.lumin.settings.impl.ColorSetting;
 import com.github.lumin.settings.impl.DoubleSetting;
 import com.github.lumin.settings.impl.ModeSetting;
-
-import java.awt.*;
 
 public class ClickGui extends Module {
 

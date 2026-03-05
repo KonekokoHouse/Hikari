@@ -28,14 +28,14 @@ public class BoolSettingComponent extends Component {
         if (!setting.isAvailable()) return;
 
         boolean hovered = ColorSettingComponent.isMouseOutOfPicker(mouseX, mouseY) && MouseUtils.isHovering(getX(), getY(), getWidth(), getHeight(), mouseX, mouseY);
-        Color bg = hovered ? new Color(255, 255, 255, (int)(18 * alpha)) : new Color(255, 255, 255, (int)(10 * alpha));
+        Color bg = hovered ? new Color(255, 255, 255, (int) (18 * alpha)) : new Color(255, 255, 255, (int) (10 * alpha));
         set.bottomRoundRect().addRoundRect(getX(), getY(), getWidth(), getHeight(), 6.0f * scale, bg);
 
         String name = setting.getDisplayName();
 
         float textScale = 0.85f * scale;
         float textY = getY() + (getHeight() - set.font().getHeight(textScale)) / 2.0f - 0.5f * scale;
-        set.font().addText(name, getX() + 6.0f * scale, textY, textScale, new Color(255, 255, 255, (int)(255 * alpha)));
+        set.font().addText(name, getX() + 6.0f * scale, textY, textScale, new Color(255, 255, 255, (int) (255 * alpha)));
 
         float switchW = 22.0f * scale;
         float switchH = 10.0f * scale;
@@ -49,7 +49,7 @@ public class BoolSettingComponent extends Component {
         if (t > 1.0f) t = 1.0f;
 
         Color trackColor = lerpColor(new Color(60, 60, 60), new Color(148, 148, 148), t);
-        set.bottomRoundRect().addRoundRect(switchX, switchY, switchW, switchH, switchH / 2.0f, new Color(trackColor.getRed(), trackColor.getGreen(), trackColor.getBlue(), (int)(255 * alpha)));
+        set.bottomRoundRect().addRoundRect(switchX, switchY, switchW, switchH, switchH / 2.0f, new Color(trackColor.getRed(), trackColor.getGreen(), trackColor.getBlue(), (int) (255 * alpha)));
 
         float thumbSize = switchH - 2.0f * scale;
         float offX = switchX + 1.0f * scale;
@@ -57,7 +57,7 @@ public class BoolSettingComponent extends Component {
         float thumbX = offX + (onX - offX) * t;
         float thumbY = switchY + 1.0f * scale;
 
-        set.bottomRoundRect().addRoundRect(thumbX, thumbY, thumbSize, thumbSize, thumbSize / 2.0f, new Color(255, 255, 255, (int)(255 * alpha)));
+        set.bottomRoundRect().addRoundRect(thumbX, thumbY, thumbSize, thumbSize, thumbSize / 2.0f, new Color(255, 255, 255, (int) (255 * alpha)));
     }
 
     private static Color lerpColor(Color a, Color b, float t) {

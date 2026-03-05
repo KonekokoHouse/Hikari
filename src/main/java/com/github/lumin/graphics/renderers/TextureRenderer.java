@@ -31,9 +31,9 @@ import java.util.*;
 public class TextureRenderer implements IRenderer {
     private final Minecraft mc = Minecraft.getInstance();
 
-    private static final int STRIDE = 44;
+    private static final int STRIDE = 56; // 44 -> 56 because Radius is now vec4 (4 floats) instead of float (1 float). 3+1+2+4+4 = 14 floats * 4 = 56 bytes
     private final long bufferSize;
-    private final Map<Identifier, Batch> batches = new LinkedHashMap<>();
+    private final Map<Object, Batch> batches = new LinkedHashMap<>();
     private final Map<Identifier, LuminTexture> textureCache = new HashMap<>();
 
     public TextureRenderer() {
@@ -57,10 +57,29 @@ public class TextureRenderer implements IRenderer {
     }
 
     public void addRoundedTexture(Identifier texture, float x, float y, float width, float height, float radius, float u0, float v0, float u1, float v1, Color color, boolean useLinearFilter) {
-        Batch batch = batches.computeIfAbsent(texture, k -> new Batch(new LuminRingBuffer(bufferSize, GpuBuffer.USAGE_VERTEX)));
+        addRoundedTexture((Object) texture, x, y, width, height, radius, radius, radius, radius, u0, v0, u1, v1, color, useLinearFilter);
+    }
+
+    public void addRoundedTexture(LuminTexture texture, float x, float y, float width, float height, float radius, float u0, float v0, float u1, float v1, Color color) {
+        addRoundedTexture((Object) texture, x, y, width, height, radius, radius, radius, radius, u0, v0, u1, v1, color, true);
+    }
+
+    public void addRoundedTexture(Identifier texture, float x, float y, float width, float height, float radiusTL, float radiusTR, float radiusBR, float radiusBL, float u0, float v0, float u1, float v1, Color color, boolean useLinearFilter) {
+        addRoundedTexture((Object) texture, x, y, width, height, radiusTL, radiusTR, radiusBR, radiusBL, u0, v0, u1, v1, color, useLinearFilter);
+    }
+
+    public void addRoundedTexture(LuminTexture texture, float x, float y, float width, float height, float radiusTL, float radiusTR, float radiusBR, float radiusBL, float u0, float v0, float u1, float v1, Color color) {
+        addRoundedTexture((Object) texture, x, y, width, height, radiusTL, radiusTR, radiusBR, radiusBL, u0, v0, u1, v1, color, true);
+    }
+
+    private void addRoundedTexture(Object textureKey, float x, float y, float width, float height, float rTL, float rTR, float rBR, float rBL, float u0, float v0, float u1, float v1, Color color, boolean useLinearFilter) {
+        Batch batch = batches.computeIfAbsent(textureKey, k -> {
+            Batch b = new Batch(new LuminRingBuffer(bufferSize, GpuBuffer.USAGE_VERTEX));
+            b.useLinearFilter = useLinearFilter;
+            return b;
+        });
 
         batch.buffer.tryMap();
-        batch.useLinearFilter = useLinearFilter;
 
         if (batch.currentOffset + (long) STRIDE * 4L > bufferSize) {
             return;
@@ -71,35 +90,47 @@ public class TextureRenderer implements IRenderer {
         float x2 = x + width;
         float y2 = y + height;
 
-        float innerX1 = x + radius;
-        float innerY1 = y + radius;
-        float innerX2 = x2 - radius;
-        float innerY2 = y2 - radius;
+        // Use maximum radius for inner rect calculation to ensure safe zone is correct
+        // But with varying radii, the inner rect concept is tricky.
+        // We will pass the OUTER Rect as InnerRect (as per shader modification plan)
+        // and pass the radii vector.
+        
+        // Shader expects: InnerRect = Outer Bounds (x, y, x2, y2)
+        // Shader expects: Radius = (TL, TR, BR, BL)
+        
+        float rectX1 = x;
+        float rectY1 = y;
+        float rectX2 = x2;
+        float rectY2 = y2;
 
         long baseAddr = MemoryUtil.memAddress(batch.buffer.getMappedBuffer());
         long p = baseAddr + batch.currentOffset;
 
-        writeVertex(p, x, y, u0, v0, argb, innerX1, innerY1, innerX2, innerY2, radius);
-        writeVertex(p + STRIDE, x, y2, u0, v1, argb, innerX1, innerY1, innerX2, innerY2, radius);
-        writeVertex(p + STRIDE * 2L, x2, y2, u1, v1, argb, innerX1, innerY1, innerX2, innerY2, radius);
-        writeVertex(p + STRIDE * 3L, x2, y, u1, v0, argb, innerX1, innerY1, innerX2, innerY2, radius);
+        writeVertex(p, x, y, u0, v0, argb, rectX1, rectY1, rectX2, rectY2, rTL, rTR, rBR, rBL);
+        writeVertex(p + STRIDE, x, y2, u0, v1, argb, rectX1, rectY1, rectX2, rectY2, rTL, rTR, rBR, rBL);
+        writeVertex(p + STRIDE * 2L, x2, y2, u1, v1, argb, rectX1, rectY1, rectX2, rectY2, rTL, rTR, rBR, rBL);
+        writeVertex(p + STRIDE * 3L, x2, y, u1, v0, argb, rectX1, rectY1, rectX2, rectY2, rTL, rTR, rBR, rBL);
 
         batch.currentOffset += (long) STRIDE * 4L;
         batch.vertexCount += 4;
     }
 
-    private void writeVertex(long addr, float x, float y, float u, float v, int color, float ix1, float iy1, float ix2, float iy2, float radius) {
+    private void writeVertex(long addr, float x, float y, float u, float v, int color, float rx1, float ry1, float rx2, float ry2, float r1, float r2, float r3, float r4) {
         MemoryUtil.memPutFloat(addr, x);
         MemoryUtil.memPutFloat(addr + 4, y);
         MemoryUtil.memPutFloat(addr + 8, 0.0f); // z
         MemoryUtil.memPutInt(addr + 12, color);
         MemoryUtil.memPutFloat(addr + 16, u);
         MemoryUtil.memPutFloat(addr + 20, v);
-        MemoryUtil.memPutFloat(addr + 24, ix1);
-        MemoryUtil.memPutFloat(addr + 28, iy1);
-        MemoryUtil.memPutFloat(addr + 32, ix2);
-        MemoryUtil.memPutFloat(addr + 36, iy2);
-        MemoryUtil.memPutFloat(addr + 40, radius);
+        MemoryUtil.memPutFloat(addr + 24, rx1);
+        MemoryUtil.memPutFloat(addr + 28, ry1);
+        MemoryUtil.memPutFloat(addr + 32, rx2);
+        MemoryUtil.memPutFloat(addr + 36, ry2);
+        // Radius vector (TL, TR, BR, BL)
+        MemoryUtil.memPutFloat(addr + 40, r1);
+        MemoryUtil.memPutFloat(addr + 44, r2);
+        MemoryUtil.memPutFloat(addr + 48, r3);
+        MemoryUtil.memPutFloat(addr + 52, r4);
     }
 
     @Override
@@ -118,8 +149,8 @@ public class TextureRenderer implements IRenderer {
                 TextureTransform.DEFAULT_TEXTURING.getMatrix()
         );
 
-        for (Map.Entry<Identifier, Batch> entry : batches.entrySet()) {
-            Identifier textureId = entry.getKey();
+        for (Map.Entry<Object, Batch> entry : batches.entrySet()) {
+            Object textureKey = entry.getKey();
             Batch batch = entry.getValue();
             if (batch.vertexCount == 0) continue;
 
@@ -131,12 +162,19 @@ public class TextureRenderer implements IRenderer {
             RenderSystem.AutoStorageIndexBuffer autoIndices = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
             GpuBuffer ibo = autoIndices.getBuffer(indexCount);
 
-            LuminTexture texture = textureCache.computeIfAbsent(textureId, id -> loadTexture(id, batch.useLinearFilter));
+            LuminTexture texture;
+            if (textureKey instanceof Identifier id) {
+                texture = textureCache.computeIfAbsent(id, key -> loadTexture(key, batch.useLinearFilter));
+            } else if (textureKey instanceof LuminTexture tex) {
+                texture = tex;
+            } else {
+                continue;
+            }
 
             try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
                     () -> "Rounded Texture Draw",
                     target.getColorTextureView(), OptionalInt.empty(),
-                    target.getDepthTextureView(), OptionalDouble.empty())
+                    null, OptionalDouble.empty())
             ) {
                 pass.setPipeline(LuminRenderPipelines.TEXTURE);
 
@@ -162,7 +200,8 @@ public class TextureRenderer implements IRenderer {
                     image = NativeImage.read(is);
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         if (image == null) {
             image = MissingTextureAtlasSprite.generateMissingImage();

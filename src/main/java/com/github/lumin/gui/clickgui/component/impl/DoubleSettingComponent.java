@@ -53,7 +53,7 @@ public class DoubleSettingComponent extends Component {
         if (!setting.isAvailable()) return;
 
         boolean hovered = ColorSettingComponent.isMouseOutOfPicker(mouseX, mouseY) && MouseUtils.isHovering(getX(), getY(), getWidth(), getHeight(), mouseX, mouseY);
-        Color bg = hovered ? new Color(255, 255, 255, (int)(18 * alpha)) : new Color(255, 255, 255, (int)(10 * alpha));
+        Color bg = hovered ? new Color(255, 255, 255, (int) (18 * alpha)) : new Color(255, 255, 255, (int) (10 * alpha));
         set.bottomRoundRect().addRoundRect(getX(), getY(), getWidth(), getHeight(), 6.0f * scale, bg);
 
         float padding = 6.0f * scale;
@@ -61,7 +61,7 @@ public class DoubleSettingComponent extends Component {
         float textY = getY() + (getHeight() - set.font().getHeight(textScale)) / 2.0f - 0.5f * scale;
 
         String name = setting.getDisplayName();
-        set.font().addText(name, getX() + padding, textY, textScale, new Color(255, 255, 255, (int)(255 * alpha)));
+        set.font().addText(name, getX() + padding, textY, textScale, new Color(255, 255, 255, (int) (255 * alpha)));
 
         String valueStr;
         String valueMeasureStr;
@@ -109,13 +109,13 @@ public class DoubleSettingComponent extends Component {
         editingAnimation.run(editing ? 1.0f : 0.0f);
         float et = Mth.clamp(editingAnimation.getValue(), 0.0f, 1.0f);
         int valueAlpha = (int) Mth.lerp(et, 12.0f, 22.0f);
-        Color valueBg = new Color(255, 255, 255, (int)(Mth.clamp(valueAlpha, 0, 255) * alpha));
+        Color valueBg = new Color(255, 255, 255, (int) (Mth.clamp(valueAlpha, 0, 255) * alpha));
         set.bottomRoundRect().addRoundRect(valueBoxX, valueBoxY, valueBoxW, valueBoxH, 6.0f * scale, valueBg);
 
         float valueW = Math.min(set.font().getWidth(valueMeasureStr, textScale), Math.max(0.0f, valueBoxW - valueInnerPad * 2.0f));
         float valueX = valueBoxX + (valueBoxW - valueW) / 2.0f;
         float valueTextY = valueBoxY + (valueBoxH - set.font().getHeight(textScale)) / 2.0f - 0.5f * scale;
-        set.font().addText(valueStr, valueX, valueTextY, textScale, new Color(200, 200, 200, (int)(255 * alpha)));
+        set.font().addText(valueStr, valueX, valueTextY, textScale, new Color(200, 200, 200, (int) (255 * alpha)));
 
         float sliderWidth = 70.0f * scale; // 条长
         float sliderHeight = 3.0f * scale;
@@ -147,7 +147,7 @@ public class DoubleSettingComponent extends Component {
         }
 
         int track = (int) Mth.lerp(it, 60.0f, 82.0f);
-        set.bottomRoundRect().addRoundRect(sliderX, sliderY, sliderWidth, sliderHeight, sliderHeight / 2.0f, new Color(track, track, track, (int)(255 * alpha)));
+        set.bottomRoundRect().addRoundRect(sliderX, sliderY, sliderWidth, sliderHeight, sliderHeight / 2.0f, new Color(track, track, track, (int) (255 * alpha)));
 
         float targetPercent = getPercent(setting.getValue(), setting.getMin(), setting.getMax());
         if (!editing && dragging) {
@@ -163,7 +163,7 @@ public class DoubleSettingComponent extends Component {
 
         if (filledW > 0) {
             int fill = (int) Mth.lerp(it, 148.0f, 176.0f);
-            set.bottomRoundRect().addRoundRect(sliderX, sliderY, filledW, sliderHeight, sliderHeight / 2.0f, new Color(fill, fill, fill, (int)(255 * alpha)));
+            set.bottomRoundRect().addRoundRect(sliderX, sliderY, filledW, sliderHeight, sliderHeight / 2.0f, new Color(fill, fill, fill, (int) (255 * alpha)));
         }
 
         float knobSize = 8.0f * scale * (1.0f + 0.35f * it);
@@ -174,9 +174,9 @@ public class DoubleSettingComponent extends Component {
         float glowY = getY() + (getHeight() - glowSize) / 2.0f;
         int glowA = (int) (42.0f * it);
         if (glowA > 0) {
-            set.bottomRoundRect().addRoundRect(glowX, glowY, glowSize, glowSize, glowSize / 2.0f, new Color(255, 255, 255, (int)(Mth.clamp(glowA, 0, 255) * alpha)));
+            set.bottomRoundRect().addRoundRect(glowX, glowY, glowSize, glowSize, glowSize / 2.0f, new Color(255, 255, 255, (int) (Mth.clamp(glowA, 0, 255) * alpha)));
         }
-        set.bottomRoundRect().addRoundRect(knobX, knobY, knobSize, knobSize, knobSize / 2.0f, new Color(255, 255, 255, (int)(255 * alpha)));
+        set.bottomRoundRect().addRoundRect(knobX, knobY, knobSize, knobSize, knobSize / 2.0f, new Color(255, 255, 255, (int) (255 * alpha)));
     }
 
     private static float getPercent(double value, double min, double max) {

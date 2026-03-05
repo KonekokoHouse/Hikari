@@ -95,6 +95,15 @@ public class RoundRectRenderer implements IRenderer {
         buffer.close();
     }
 
-    public void setScissor(int x, int y, int width, int height) { scissorEnabled = true; scissorX = x; scissorY = y; scissorW = width; scissorH = height; }
-    public void clearScissor() { scissorEnabled = false; }
+    public void setScissor(int x, int y, int width, int height) {
+        scissorEnabled = true;
+        scissorX = x;
+        scissorY = y;
+        scissorW = width;
+        scissorH = height;
+    }
+
+    public void clearScissor() {
+        scissorEnabled = false;
+    }
 }

@@ -137,17 +137,17 @@ public class ModuleComponent implements IComponent {
         }
 
         if (animW > 0.5f && animH > 0.5f) {
-            set.bottomRoundRect().addRoundRect(animX, animY, animW, animH, animRadius, new Color(25, 25, 25, (int)(140 * progress)));
+            set.bottomRoundRect().addRoundRect(animX, animY, animW, animH, animRadius, new Color(25, 25, 25, (int) (140 * progress)));
         }
 
         if (progress <= 0.01f) return;
 
-        int contentAlpha = (int)(255 * progress);
+        int contentAlpha = (int) (255 * progress);
         Color textColor = new Color(255, 255, 255, contentAlpha);
         Color dimTextColor = new Color(200, 200, 200, contentAlpha);
-        Color boxBgColor = new Color(0, 0, 0, (int)(70 * progress));
-        Color selectedBgColor = new Color(255, 255, 255, (int)(26 * progress));
-        Color dividerColor = new Color(255, 255, 255, (int)(14 * progress));
+        Color boxBgColor = new Color(0, 0, 0, (int) (70 * progress));
+        Color selectedBgColor = new Color(255, 255, 255, (int) (26 * progress));
+        Color dividerColor = new Color(255, 255, 255, (int) (14 * progress));
 
         float titleScale = 1.15f * guiScale;
         float titleY = animY + padding - guiScale;
@@ -195,7 +195,7 @@ public class ModuleComponent implements IComponent {
         lastBindListenH = headerH;
 
         if (bindingKey) {
-            Color listenBg = new Color(255, 255, 255, (int)(22 * progress));
+            Color listenBg = new Color(255, 255, 255, (int) (22 * progress));
             set.bottomRoundRect().addRoundRect(lastBindListenX, lastBindListenY, lastBindListenW, lastBindListenH, bindRadius, listenBg);
 
             if (System.currentTimeMillis() % 1000 > 500) {

@@ -217,7 +217,10 @@ public class TtfTextRenderer implements ITextRenderer {
     @Override
     public void setScissor(int x, int y, int width, int height) {
         scissorEnabled = true;
-        scissorX = x; scissorY = y; scissorW = width; scissorH = height;
+        scissorX = x;
+        scissorY = y;
+        scissorW = width;
+        scissorH = height;
     }
 
     @Override

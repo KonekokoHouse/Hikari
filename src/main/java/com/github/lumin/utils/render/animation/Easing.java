@@ -75,8 +75,8 @@ public enum Easing {
     }),
     SILK(x -> {
         return x < 0.5f
-            ? 4.0f * x * x * x * x * x
-            : 1.0f - (float) Math.pow(-2.0f * x + 2.0f, 5) / 2.0f;
+                ? 4.0f * x * x * x * x * x
+                : 1.0f - (float) Math.pow(-2.0f * x + 2.0f, 5) / 2.0f;
     });
 
     private final Function<Float, Float> function;

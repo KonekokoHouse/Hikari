@@ -1,7 +1,6 @@
 package com.github.lumin.gui.clickgui;
 
 import com.github.lumin.graphics.renderers.RectRenderer;
-import com.github.lumin.graphics.shaders.BlurShader;
 import com.github.lumin.gui.clickgui.component.impl.ColorSettingComponent;
 import com.github.lumin.gui.clickgui.panel.Panel;
 import com.github.lumin.modules.impl.client.ClickGui;
@@ -20,8 +19,6 @@ import java.awt.*;
 public class ClickGuiScreen extends Screen {
 
     private final Panel panel = new Panel();
-
-    private final RectRenderer rectRenderer = new RectRenderer();
 
     private final Animation openAnimation = new Animation(Easing.EASE_OUT_QUAD, 300);
 
@@ -44,11 +41,8 @@ public class ClickGuiScreen extends Screen {
         float alpha = openAnimation.getValue();
 
         if (ClickGui.INSTANCE.backgroundBlur.getValue() && ClickGui.INSTANCE.blurMode.is("全屏")) {
-            BlurShader.drawQuadBlur(0, 0, guiW, guiH, ClickGui.INSTANCE.blurStrength.getValue().floatValue());
+            //drawQuadBlur(0, 0, guiW, guiH, ClickGui.INSTANCE.blurStrength.getValue());
         }
-
-        rectRenderer.addRect(0, 0, guiW, guiH, new Color(18, 18, 18, (int) (110 * alpha)));
-        rectRenderer.drawAndClear();
 
         panel.render(null, mouseX, mouseY, partialTick, alpha);
     }
