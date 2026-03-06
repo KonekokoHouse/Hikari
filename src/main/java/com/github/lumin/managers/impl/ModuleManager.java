@@ -51,7 +51,10 @@ public class ModuleManager {
 
                 // Visual
                 Nametags.INSTANCE,
-                RenderTest.INSTANCE
+                RenderTest.INSTANCE,
+
+                // Misc
+                AutoKouZi.INSTANCE
 
         );
     }
