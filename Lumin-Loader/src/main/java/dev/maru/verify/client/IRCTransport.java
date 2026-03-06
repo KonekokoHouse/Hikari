@@ -157,6 +157,13 @@ public class IRCTransport {
                 h.onCloudConfigListResult(p.isSuccess(), p.getNames(), p.getMax(), p.getMessage());
             }
         }
+        if (msg instanceof DownloadModS2C p) {
+            IRCHandler h = handler;
+            if (h != null) {
+                h.onModDownload(p.getContent(), p.getHash());
+            }
+            return;
+        }
     }
 
     private void notifyDisconnected(String message) {

@@ -1,5 +1,6 @@
 {
   "required": true,
+  "plugin": "dev.maru.loader.MixinPlugin",
   "package": "dev.maru.mixins",
   "compatibilityLevel": "JAVA_21",
   "mixins": [

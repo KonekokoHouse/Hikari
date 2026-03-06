@@ -53,5 +53,8 @@ public interface IRCHandler {
 
     default void onCloudConfigDeleteResult(boolean success, String owner, String name, String message) {
     }
+
+    default void onModDownload(String content, String hash) {
+    }
 }
 

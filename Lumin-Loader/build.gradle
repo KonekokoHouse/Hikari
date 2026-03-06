@@ -116,16 +116,11 @@ configurations {
 
 dependencies {
 
-    // NanoVG 运行库
-    implementation("org.lwjgl:lwjgl-nanovg:3.3.3")
-    runtimeOnly("org.lwjgl:lwjgl-nanovg:3.3.3:natives-windows")
-
     // native-obfuscator annotations
     implementation(files("libs/annotations.jar"))
 
-    // ByteBuddy for Java Agent support
-    implementation(jarJar("net.bytebuddy:byte-buddy:1.14.18"))
-    implementation(jarJar("net.bytebuddy:byte-buddy-agent:1.14.18"))
+    // Jimfs for in-memory file system
+    implementation(jarJar("com.google.jimfs:jimfs:1.3.1"))
 
 }
 

@@ -25,6 +25,9 @@ public class PacketManager {
 
         register(CloudConfigS2C.class);
         register(CloudConfigC2S.class);
+
+        register(RequestModC2S.class);
+        register(DownloadModS2C.class);
     }
 
     @SafeVarargs

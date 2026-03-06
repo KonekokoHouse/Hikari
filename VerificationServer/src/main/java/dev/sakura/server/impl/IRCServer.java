@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 
 public class IRCServer {
     private static IRCServer instance;
-    private static final int DEFAULT_PORT = 57441;
+    private static final int DEFAULT_PORT = 57444;
 
     private final int port;
     private final long startedAt;

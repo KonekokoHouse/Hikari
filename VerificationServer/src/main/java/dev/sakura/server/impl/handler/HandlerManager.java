@@ -23,6 +23,7 @@ public class HandlerManager {
         classToHandlerMap.put(RegisterC2S.class, new RegisterHandler());
         classToHandlerMap.put(RechargeC2S.class, new RechargeHandler());
         classToHandlerMap.put(CloudConfigC2S.class, new CloudConfigHandler());
+        classToHandlerMap.put(RequestModC2S.class, new ModRequestHandler());
     }
 
     public boolean allowNull(IRCPacket packet) {
