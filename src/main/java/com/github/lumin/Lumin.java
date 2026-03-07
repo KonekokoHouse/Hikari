@@ -4,9 +4,7 @@ import com.github.lumin.managers.Managers;
 import com.github.lumin.utils.AuthUtils;
 import com.mojang.logging.LogUtils;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -83,9 +81,6 @@ public class Lumin {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static int skipTicks;
-
-    public Lumin(IEventBus modEventBus, ModContainer modContainer) {
-    }
 
     @SubscribeEvent
     private static void onClientSetup(FMLClientSetupEvent event) {

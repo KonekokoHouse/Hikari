@@ -1,12 +1,9 @@
 package com.github.lumin.utils;
 
-import java.lang.reflect.Method;
-import java.util.Base64;
-
 public class AuthUtils {
 
     public static void doSomethingImportant() {
-        try {
+        /*try {
             Class<?> luminApiClass = Class.forName("dev.maru.api.LuminAPI");
 
             // 检查是否连接
@@ -71,7 +68,7 @@ public class AuthUtils {
                 exit.invoke(null, 0);
             } catch (Exception ignored) {
             }
-        }
+        }*/
     }
 
 }

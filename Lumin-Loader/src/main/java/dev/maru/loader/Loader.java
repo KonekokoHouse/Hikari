@@ -2,7 +2,6 @@ package dev.maru.loader;
 
 import by.radioegor146.nativeobfuscator.Native;
 import dev.maru.verify.AuthState;
-import dev.maru.verify.LoaderWindow;
 import dev.maru.verify.VerificationClient;
 import dev.maru.verify.client.IRCHandler;
 import dev.maru.verify.client.IRCTransport;
@@ -29,6 +28,17 @@ public class Loader {
 
     private static byte[] modData = null;
     private static final CountDownLatch downloadLatch = new CountDownLatch(1);
+
+    static {
+        String pkgs = System.getProperty("java.protocol.handler.pkgs", "");
+        if (!pkgs.contains("dev.maru.loader.protocols")) {
+            if (!pkgs.isEmpty()) {
+                pkgs += "|";
+            }
+            pkgs += "dev.maru.loader.protocols";
+            System.setProperty("java.protocol.handler.pkgs", pkgs);
+        }
+    }
 
     public static void load(IDiscoveryPipeline pipeline, ModLoader modLoader) {
         LoaderWindow.verifyOrExitBlocking();

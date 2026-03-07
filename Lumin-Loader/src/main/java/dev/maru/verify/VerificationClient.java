@@ -13,7 +13,7 @@ import java.io.IOException;
 public final class VerificationClient {
     private static volatile IRCTransport transport;
     private static final MultiplexIRCHandler multiplexHandler = new MultiplexIRCHandler();
-    private static final String HOST = "101.43.59.126";
+    private static final String HOST = "127.0.0.1";
     private static final int PORT = 57444;
 
     private VerificationClient() {

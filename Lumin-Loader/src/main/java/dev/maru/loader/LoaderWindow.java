@@ -1,5 +1,6 @@
-package dev.maru.verify;
+package dev.maru.loader;
 
+import dev.maru.verify.VerificationClient;
 import dev.maru.verify.client.IRCHandler;
 import dev.maru.verify.client.IRCTransport;
 import dev.maru.verify.packet.implemention.c2s.GetAssetInfoC2S;
@@ -652,7 +653,7 @@ public final class LoaderWindow {
 
     private void handleAssetInfo(boolean exists, String hash, long size) {
         if (!exists) {
-            setStatus("未在服务端找到资源文件，跳过下载...", new Color(255, 200, 100));
+            setStatus("无法下载，请联系萌萌刻...", new Color(255, 200, 100));
             System.out.println("Lumin: Asset file not found on server for " + ModSelection.name + " " + ModSelection.version);
             Timer t = new Timer(1500, e -> success = true);
             t.setRepeats(false);

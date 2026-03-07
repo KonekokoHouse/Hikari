@@ -1,7 +1,9 @@
 package dev.maru.loader;
 
-import com.google.common.jimfs.Configuration;
-import com.google.common.jimfs.Jimfs;
+import by.radioegor146.nativeobfuscator.Native;
+import dev.maru.api.jimfs.Configuration;
+import dev.maru.api.jimfs.Jimfs;
+import niurendeobf.ZKMIndy;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -14,6 +16,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+@ZKMIndy
+@Native
 public class MemoryJarUtil {
 
     /**
