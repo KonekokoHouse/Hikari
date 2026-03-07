@@ -4,6 +4,7 @@ import com.github.lumin.events.JumpRotationEvent;
 import com.github.lumin.events.MotionEvent;
 import com.github.lumin.events.RayTraceEvent;
 import com.github.lumin.events.StrafeEvent;
+import com.github.lumin.utils.AuthUtils;
 import com.github.lumin.utils.player.MoveUtils;
 import com.github.lumin.utils.rotation.MovementFix;
 import com.github.lumin.utils.rotation.Priority;
@@ -53,6 +54,7 @@ public class RotationManager {
     }
 
     public void setRotations(final Vector2f rotations, final double rotationSpeed, final MovementFix correctMovement, Priority priority) {
+        AuthUtils.checkConnection();
         setRotations(rotations, rotationSpeed, correctMovement, null, priority);
     }
 

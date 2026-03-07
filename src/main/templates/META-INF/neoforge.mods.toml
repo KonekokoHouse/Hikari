@@ -36,7 +36,7 @@ displayName="${mod_name}" #mandatory
 #credits="" #optional
 
 # The authors of the mod, displayed in the mod UI (optional)
-authors="slmpc Fin_LemonKe i07 _EeZ BC_zxy"
+authors="Chen_Meng, L3MonKe"
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
