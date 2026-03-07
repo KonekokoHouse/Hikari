@@ -83,7 +83,7 @@ public class MainMenuScreen extends Screen {
         }
 
         if (backgroundTexture != null) {
-            textureRenderer.addQuadTexture(BACKGROUND_TEXTURE, 0, 0, width, height, 0, 0, 1, 1, Color.WHITE,true);
+            textureRenderer.addQuadTexture(BACKGROUND_TEXTURE, 0, 0, width, height, 0, 0, 1, 1, Color.WHITE, true);
         }
         rectRenderer.addRect(0, 0, width, height, new Color(0, 0, 0, 100));
 

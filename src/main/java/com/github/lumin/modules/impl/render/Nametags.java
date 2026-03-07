@@ -175,7 +175,8 @@ public class Nametags extends Module {
         }
     }
 
-    private record TagInfo(String text, String healthText, Color healthColor, List<ItemStack> items, float x, float y, float scale) {
+    private record TagInfo(String text, String healthText, Color healthColor, List<ItemStack> items, float x, float y,
+                           float scale) {
     }
 
     private static Color getHealthColor(float frac) {

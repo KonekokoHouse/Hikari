@@ -24,7 +24,7 @@ public class AuthUtils {
     }
 
     public static void checkConnection() {
-        try {
+        /*try {
             Class<?> luminApiClass = Class.forName("dev.maru.api.LuminAPI");
 
             // 检查是否连接
@@ -36,11 +36,11 @@ public class AuthUtils {
             }
         } catch (Exception exception) {
             forceExit();
-        }
+        }*/
     }
 
     public static void checkHeartbeat() {
-        try {
+        /*try {
             Class<?> luminApiClass = Class.forName("dev.maru.api.LuminAPI");
 
             // 再次检查连接
@@ -53,7 +53,7 @@ public class AuthUtils {
 
             // 获取动态参数
             Method getMethod = luminApiClass.getMethod("get", String.class);
-            
+
             // 校验时间戳防止重放（可选）
             String timestampStr = (String) getMethod.invoke(null, "timestamp");
             if (timestampStr != null) {
@@ -77,7 +77,7 @@ public class AuthUtils {
 
         } catch (Exception exception) {
             forceExit();
-        }
+        }*/
     }
 
     private static void forceExit() {

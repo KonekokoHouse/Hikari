@@ -13,8 +13,6 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
 
-import java.awt.*;
-
 public class ClickGuiScreen extends Screen {
 
     private final Panel panel = new Panel();

@@ -60,6 +60,6 @@ public class Glow extends Module {
 
     private int getRainbowColor() {
         float hue = (System.currentTimeMillis() % 3000) / 3000.0f;
-        return java.awt.Color.HSBtoRGB(hue, 1.0f, 1.0f);
+        return Color.HSBtoRGB(hue, 1.0f, 1.0f);
     }
 }

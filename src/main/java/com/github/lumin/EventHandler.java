@@ -2,11 +2,9 @@ package com.github.lumin;
 
 import com.github.lumin.graphics.LuminRenderPipelines;
 import com.github.lumin.managers.Managers;
-import com.github.lumin.utils.AuthUtils;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 
