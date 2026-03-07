@@ -126,12 +126,12 @@ final class JimfsFileStore
 
     @Override
     public String name() {
-        return "protocol";
+        return "jimfs";
     }
 
     @Override
     public String type() {
-        return "protocol";
+        return "jimfs";
     }
 
     @Override

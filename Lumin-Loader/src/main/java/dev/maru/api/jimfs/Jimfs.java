@@ -19,7 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class Jimfs {
-    public static final String URI_SCHEME = "protocol";
+    public static final String URI_SCHEME = "jimfs";
     private static final Logger LOGGER = Logger.getLogger(Jimfs.class.getName());
     static final @Nullable FileSystemProvider systemProvider = Jimfs.getSystemJimfsProvider();
 

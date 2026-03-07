@@ -30,12 +30,12 @@ public final class SystemJimfsFileSystemProvider
 
     @Override
     public String getScheme() {
-        return "protocol";
+        return "jimfs";
     }
 
     @Override
     public FileSystem newFileSystem(URI uri, Map<String, ?> env) throws IOException {
-        Preconditions.checkArgument(uri.getScheme().equalsIgnoreCase("protocol"), "uri (%s) scheme must be '%s'", (Object) uri, (Object) "protocol");
+        Preconditions.checkArgument(uri.getScheme().equalsIgnoreCase("jimfs"), "uri (%s) scheme must be '%s'", (Object) uri, (Object) "jimfs");
         Preconditions.checkArgument(SystemJimfsFileSystemProvider.isValidFileSystemUri(uri), "uri (%s) may not have a path, query or fragment", (Object) uri);
         Preconditions.checkArgument(env.get(FILE_SYSTEM_KEY) instanceof FileSystem, "env map (%s) must contain key '%s' mapped to an instance of %s", env, (Object) FILE_SYSTEM_KEY, FileSystem.class);
         FileSystem fileSystem = (FileSystem) env.get(FILE_SYSTEM_KEY);
@@ -56,7 +56,7 @@ public final class SystemJimfsFileSystemProvider
 
     @Override
     public Path getPath(URI uri) {
-        Preconditions.checkArgument("protocol".equalsIgnoreCase(uri.getScheme()), "uri scheme does not match this provider: %s", (Object) uri);
+        Preconditions.checkArgument("jimfs".equalsIgnoreCase(uri.getScheme()), "uri scheme does not match this provider: %s", (Object) uri);
         String path = uri.getPath();
         Preconditions.checkArgument(!Strings.isNullOrEmpty(path), "uri must have a path: %s", (Object) uri);
         return SystemJimfsFileSystemProvider.toPath(this.getFileSystem(SystemJimfsFileSystemProvider.toFileSystemUri(uri)), uri);

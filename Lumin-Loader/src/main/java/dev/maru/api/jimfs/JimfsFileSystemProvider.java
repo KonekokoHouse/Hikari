@@ -35,7 +35,7 @@ final class JimfsFileSystemProvider
 
     @Override
     public String getScheme() {
-        return "protocol";
+        return "jimfs";
     }
 
     @Override
