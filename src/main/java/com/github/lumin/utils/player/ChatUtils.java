@@ -16,11 +16,15 @@ public class ChatUtils {
     }
 
     public static void addChatMessage(boolean prefix, String message) {
-        mc.gui.getChat().addMessage(Component.literal((prefix ? CLIENT_PREFIX : "") + message));
+        mc.execute(() -> mc.gui.getChat().addMessage(Component.literal((prefix ? CLIENT_PREFIX : "") + message)));
     }
 
     public static void addPlayerMessage(String message) {
-        mc.player.displayClientMessage(Component.literal(message.replace('&', '§')), false);
+        mc.execute(() -> {
+            if (mc.player != null) {
+                mc.player.displayClientMessage(Component.literal(message.replace('&', '§')), false);
+            }
+        });
     }
 
 }
