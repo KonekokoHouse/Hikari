@@ -75,9 +75,7 @@ public class Module {
     }
 
     public void setEnabled(boolean enabled) {
-        if (enabled != this.enabled) {
-            toggle();
-        }
+        this.enabled = enabled;
     }
 
     public void reset() {

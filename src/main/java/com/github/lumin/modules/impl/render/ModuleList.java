@@ -130,5 +130,6 @@ public class ModuleList extends Module {
         return 4.0f * scale.getValue().floatValue();
     }
 
-    private record ItemInfo(Module module, String text, float boxWidth, float boxHeight, float totalWidth) {}
+    private record ItemInfo(Module module, String text, float boxWidth, float boxHeight, float totalWidth) {
+    }
 }

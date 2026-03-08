@@ -5,7 +5,7 @@ public enum Category {
     COMBAT("b", "战斗", "ComBat"),
     PLAYER("5", "玩家", "Player"),
     RENDER("a", "渲染", "Render"),
-    WORLD("3","世界","World"),
+    WORLD("3", "世界", "World"),
     CLIENT("7", "客户端", "Client");
 
     public final String icon;

@@ -54,11 +54,6 @@ public class AutoAccount extends Module {
         state = State.Hub;
         gamesPlayed = 0;
         timer.reset();
-
-        mc.options.pauseOnLostFocus = false;
-        if (mc.screen == null) {
-            mc.mouseHandler.releaseMouse();
-        }
     }
 
     @Override
@@ -75,6 +70,11 @@ public class AutoAccount extends Module {
     @SubscribeEvent
     private void onTick(ClientTickEvent.Pre event) {
         if (nullCheck()) return;
+
+        mc.options.pauseOnLostFocus = false;
+        if (mc.screen == null) {
+            mc.mouseHandler.releaseMouse();
+        }
 
         switch (state) {
             case Hub -> {
