@@ -1,8 +1,8 @@
 package com.github.lumin.modules;
 
-import com.github.lumin.Lumin;
 import com.github.lumin.settings.Setting;
 import com.github.lumin.settings.impl.*;
+import com.github.lumin.utils.player.ChatUtils;
 import net.minecraft.client.Minecraft;
 import net.neoforged.neoforge.common.NeoForge;
 
@@ -57,7 +57,7 @@ public class Module {
 
             onEnable();
 
-            Lumin.LOGGER.info("{} 已启用", chineseName);
+            ChatUtils.addChatMessage(chineseName + " 已启用");
         } else {
             try {
                 NeoForge.EVENT_BUS.unregister(this);
@@ -66,7 +66,7 @@ public class Module {
 
             onDisable();
 
-            Lumin.LOGGER.info("{} 已禁用", chineseName);
+            ChatUtils.addChatMessage(chineseName + " 已禁用");
         }
     }
 

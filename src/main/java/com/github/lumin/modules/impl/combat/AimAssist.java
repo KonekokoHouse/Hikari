@@ -26,7 +26,7 @@ public class AimAssist extends Module {
     public static final AimAssist INSTANCE = new AimAssist();
 
     public ModeSetting mode = modeSetting("平滑模式", "快速", new String[]{"快速", "平稳"});
-    public DoubleSetting range = doubleSetting("目标距离", 4.2, 1.0, 8.0, 0.1);
+    public DoubleSetting range = doubleSetting("目标距离", 4.2, 1.0, 100, 0.1);
     public DoubleSetting speed = doubleSetting("旋转速度", 10.0, 1.0, 180.0, 1.0);
     public DoubleSetting strength = doubleSetting("插值强度", 0.1, 0.01, 1.0, 0.01);
     public BoolSetting ignoreScreen = boolSetting("屏幕打开时忽略", true);
