@@ -29,7 +29,7 @@ public class AutoClicker extends Module {
     private long readyTime = 0;
 
     private AutoClicker() {
-        super("连点器", "AutoClicker", Category.COMBAT);
+        super("AutoClicker", Category.COMBAT);
     }
 
     @SubscribeEvent

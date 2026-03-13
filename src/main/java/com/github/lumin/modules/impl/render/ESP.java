@@ -19,7 +19,7 @@ public class ESP extends Module {
     public static final ESP INSTANCE = new ESP();
 
     private ESP() {
-        super("透视", "ESP", Category.RENDER);
+        super("ESP", Category.RENDER);
     }
 
     private final BoolSetting targetChests = boolSetting("箱子", true);

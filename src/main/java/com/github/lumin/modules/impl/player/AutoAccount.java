@@ -11,7 +11,7 @@ public class AutoAccount extends Module {
     public static final AutoAccount INSTANCE = new AutoAccount();
 
     private AutoAccount() {
-        super("自动豁免", "AutoAccount", Category.PLAYER);
+        super("AutoAccount", Category.PLAYER);
     }
 
     @SubscribeEvent

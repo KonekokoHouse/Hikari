@@ -12,8 +12,7 @@ import java.util.List;
 
 public class Module {
 
-    private final String cnName;
-    private final String enName;
+    private final String name;
 
     public Category category;
 
@@ -29,9 +28,8 @@ public class Module {
 
     protected static final Minecraft mc = Minecraft.getInstance();
 
-    public Module(String cnName, String enName, Category category) {
-        this.cnName = cnName;
-        this.enName = enName;
+    public Module(String name, Category category) {
+        this.name = name;
         this.category = category;
     }
 
@@ -56,7 +54,7 @@ public class Module {
 
             onEnable();
 
-            Lumin.LOGGER.info("{} 已启用", cnName);
+            Lumin.LOGGER.info("{} 已启用", name);
         } else {
             try {
                 NeoForge.EVENT_BUS.unregister(this);
@@ -65,7 +63,7 @@ public class Module {
 
             onDisable();
 
-            Lumin.LOGGER.info("{} 已禁用", cnName);
+            Lumin.LOGGER.info("{} 已禁用", name);
         }
     }
 
@@ -113,19 +111,19 @@ public class Module {
     }
 
     public String getName() {
-        return cnName;
+        return name;
     }
 
     public String getCnName() {
-        return cnName;
+        return name;
     }
 
     public String getDescription() {
-        return enName;
+        return name;
     }
 
     public String getChineseDescription() {
-        return enName;
+        return name;
     }
 
     protected IntSetting intSetting(String name, int defaultValue, int min, int max, int step, Setting.Dependency dependency) {

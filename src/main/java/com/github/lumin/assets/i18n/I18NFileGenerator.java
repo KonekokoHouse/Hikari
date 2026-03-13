@@ -1,8 +1,8 @@
 package com.github.lumin.assets.i18n;
 
+import com.github.lumin.managers.impl.ModuleManager;
 import com.github.lumin.modules.Category;
 import com.github.lumin.modules.Module;
-import com.github.lumin.managers.impl.ModuleManager;
 import com.github.lumin.settings.Setting;
 import com.github.lumin.settings.impl.EnumSetting;
 import com.google.gson.Gson;

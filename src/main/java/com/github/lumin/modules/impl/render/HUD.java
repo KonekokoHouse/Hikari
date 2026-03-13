@@ -17,7 +17,7 @@ public class HUD extends Module {
     public static final HUD INSTANCE = new HUD();
 
     private HUD() {
-        super("界面", "HUD", Category.RENDER);
+        super("HUD", Category.RENDER);
     }
 
     private final DoubleSetting scale = doubleSetting("缩放", 3.5, 1.0, 5.0, 0.1);

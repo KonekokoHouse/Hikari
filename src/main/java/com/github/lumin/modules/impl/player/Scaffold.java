@@ -46,7 +46,7 @@ public class Scaffold extends Module {
     public static final Scaffold INSTANCE = new Scaffold();
 
     private Scaffold() {
-        super("自动搭路", "Scaffold", Category.PLAYER);
+        super("Scaffold", Category.PLAYER);
 
         NeoForge.EVENT_BUS.addListener((RenderLevelStageEvent.AfterEntities event) -> {
             if (nullCheck()) return;

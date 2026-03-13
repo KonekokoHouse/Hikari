@@ -40,7 +40,7 @@ public class KillAura extends Module {
     public static final KillAura INSTANCE = new KillAura();
 
     private KillAura() {
-        super("杀戮光环", "KillAura", Category.COMBAT);
+        super("KillAura", Category.COMBAT);
     }
 
     public EnumSetting<MoveFixMode> moveFix = enumSetting("移动修正模式", MoveFixMode.Silent);

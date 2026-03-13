@@ -15,7 +15,7 @@ public class ClickGui extends Module {
     public static final ClickGui INSTANCE = new ClickGui();
 
     private ClickGui() {
-        super("控制面板", "ClickGui", Category.CLIENT);
+        super("ClickGui", Category.CLIENT);
     }
 
     public final DoubleSetting scale = doubleSetting("界面缩放", 1.0, 0.5, 2.0, 0.05);

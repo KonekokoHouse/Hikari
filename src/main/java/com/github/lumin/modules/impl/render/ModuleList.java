@@ -25,7 +25,7 @@ public class ModuleList extends Module {
     public static final ModuleList INSTANCE = new ModuleList();
 
     private ModuleList() {
-        super("功能列表", "ModuleList", Category.RENDER);
+        super("ModuleList", Category.RENDER);
     }
 
     private final DoubleSetting scale = doubleSetting("缩放", 1.0, 0.5, 2.0, 0.1);
