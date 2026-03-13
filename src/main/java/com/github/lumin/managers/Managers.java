@@ -3,7 +3,6 @@ package com.github.lumin.managers;
 import com.github.lumin.managers.impl.ConfigManager;
 import com.github.lumin.managers.impl.ModuleManager;
 import com.github.lumin.managers.impl.RotationManager;
-import com.github.lumin.managers.impl.TranslateManager;
 
 public class Managers {
 

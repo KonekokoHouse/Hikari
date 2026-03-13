@@ -22,9 +22,9 @@ public class ClickGui extends Module {
     public final ColorSetting shadowColor = colorSetting("ShadowColor", new Color(0, 0, 0, 113));
 
     public final BoolSetting backgroundBlackColor = boolSetting("BackgroundBlackColor", true);
-    public final BoolSetting backgroundBlur = boolSetting("BackgroundBlur", true);
-    public final DoubleSetting blurStrength = doubleSetting("BlurStrength", 10.5, 1.0, 15, 0.5, backgroundBlur::getValue);
-    public final EnumSetting<BlurMode> blurMode = enumSetting("BlurMode", BlurMode.FullScreen, backgroundBlur::getValue);
+    private final BoolSetting backgroundBlur = boolSetting("BackgroundBlur", true);
+    private final DoubleSetting blurStrength = doubleSetting("BlurStrength", 10.5, 1.0, 15, 0.5, backgroundBlur::getValue);
+    private final EnumSetting<BlurMode> blurMode = enumSetting("BlurMode", BlurMode.FullScreen, backgroundBlur::getValue);
 
     @Override
     protected void onEnable() {
@@ -39,19 +39,25 @@ public class ClickGui extends Module {
         }
     }
 
-    public enum BlurMode {
+    public boolean shouldBlur() {
+        return backgroundBlur.getValue();
+    }
+
+    public boolean isFullScreenBlur() {
+        return shouldBlur() && blurMode.is(BlurMode.FullScreen);
+    }
+
+    public boolean isSidebarBlur() {
+        return shouldBlur() && blurMode.is(BlurMode.OnlySideBar);
+    }
+
+    public float getBlurStrength() {
+        return blurStrength.getValue().floatValue();
+    }
+
+    private enum BlurMode {
         FullScreen,
         OnlySideBar,
     }
 
 }
-
-//    public static Color getMainColor() {
-//        return INSTANCE.mainColor.getValue();
-//    }
-//
-//    public static Color getSecondColor() {
-//        return INSTANCE.secondColor.getValue();
-//    }
-//
-//}

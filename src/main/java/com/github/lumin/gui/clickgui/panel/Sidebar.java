@@ -1,5 +1,6 @@
 package com.github.lumin.gui.clickgui.panel;
 
+import com.github.lumin.assets.i18n.TranslateComponent;
 import com.github.lumin.graphics.shaders.BlurShader;
 import com.github.lumin.graphics.text.StaticFontLoader;
 import com.github.lumin.gui.IComponent;
@@ -8,7 +9,6 @@ import com.github.lumin.modules.impl.client.ClickGui;
 import com.github.lumin.utils.render.MouseUtils;
 import com.github.lumin.utils.render.animation.Animation;
 import com.github.lumin.utils.render.animation.Easing;
-import com.mojang.blaze3d.textures.GpuSampler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
@@ -30,7 +30,8 @@ public class Sidebar implements IComponent {
     private Consumer<Category> onSelect;
     private final Animation selectedHighlightY = new Animation(Easing.EASE_OUT_QUAD, 160L);
     private boolean highlightInitialized;
-    private GpuSampler blurSampler;
+
+    private final TranslateComponent gameAccountText = TranslateComponent.create("gui", "gameaccount");
 
     public Sidebar() {
         for (Category category : Category.values()) {
@@ -69,8 +70,8 @@ public class Sidebar implements IComponent {
         float width = this.width * guiScale;
         float height = this.height * guiScale;
 
-        if (ClickGui.INSTANCE.backgroundBlur.getValue() && ClickGui.INSTANCE.blurMode.is("仅侧边栏")) {
-            BlurShader.INSTANCE.drawBlur(x, y, width, height, radius, 0, 0, radius, ClickGui.INSTANCE.blurStrength.getValue().floatValue());
+        if (ClickGui.INSTANCE.isSidebarBlur()) {
+            BlurShader.INSTANCE.drawBlur(x, y, width, height, radius, 0, 0, radius, ClickGui.INSTANCE.getBlurStrength());
         }
 
         set.bottomRoundRect().addRoundRect(x, y, width, height, radius, 0, 0, radius, applyAlpha(new Color(0x5F000000, true), alpha));
@@ -138,7 +139,7 @@ public class Sidebar implements IComponent {
                 set.font().addText(playerName, textX, nameY, currentScale, applyAlpha(Color.WHITE, alpha));
             }
 
-            set.font().addText("游戏账号", textX, accountY + 2, guiScale * 0.7f, applyAlpha(Color.GRAY, alpha));
+            set.font().addText(gameAccountText.getTranslatedName(), textX, accountY + 2, guiScale * 0.7f, applyAlpha(Color.GRAY, alpha));
         }
 
         // Category Placeholder

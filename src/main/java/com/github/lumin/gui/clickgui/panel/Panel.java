@@ -45,10 +45,8 @@ public class Panel implements IComponent {
             rectRenderer.drawAndClear();
         }
 
-        if (ClickGui.INSTANCE.blurMode.is("全屏")) {
-            if (ClickGui.INSTANCE.backgroundBlur.getValue()) {
-                BlurShader.INSTANCE.drawBlur(0.0f, 0.0f, screenWidth, screenHeight, 0.0f, ClickGui.INSTANCE.blurStrength.getValue().floatValue());
-            }
+        if (ClickGui.INSTANCE.isFullScreenBlur()) {
+            BlurShader.INSTANCE.drawBlur(0.0f, 0.0f, screenWidth, screenHeight, 0.0f, ClickGui.INSTANCE.getBlurStrength());
         }
 
         float targetWidth = screenWidth * 0.5f;

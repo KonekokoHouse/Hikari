@@ -144,7 +144,7 @@ public class ColorSettingComponent extends Component {
 
     public void renderOverlayBlur(int mouseX, int mouseY, float partialTicks) {
         if (!opened) return;
-        if (!ClickGui.INSTANCE.backgroundBlur.getValue()) return;
+        if (!ClickGui.INSTANCE.shouldBlur()) return;
         float panelW = ColorPicker.preferredWidth(scale);
         float panelH = ColorPicker.preferredHeight(scale, setting.isAllowAlpha());
         float gap = 5.0f * scale;

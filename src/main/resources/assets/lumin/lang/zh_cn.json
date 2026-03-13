@@ -63,8 +63,8 @@
   "lumin.modules.noslow.mode": "模式",
   "lumin.modules.noslow.mode.vanilla": "原版",
   "lumin.modules.noslow.mode.jump": "跳跃",
-  "lumin.modules.noslow.mode.grim1_2": "Grim1.2",
-  "lumin.modules.noslow.mode.grim1_3": "Grim1.3",
+  "lumin.modules.noslow.mode.grim1_2": "Grim 1/2",
+  "lumin.modules.noslow.mode.grim1_3": "Grim 1/3",
   "lumin.modules.noslow.food": "食物",
   "lumin.modules.noslow.bow": "弓",
   "lumin.modules.noslow.crossbow": "弩",
@@ -76,7 +76,7 @@
   "lumin.modules.scaffold.swapmode": "切换模式",
   "lumin.modules.scaffold.swapmode.none": "无",
   "lumin.modules.scaffold.swapmode.normal": "普通",
-  "lumin.modules.scaffold.swapmode.hotbarswitch": "快捷栏切换",
+  "lumin.modules.scaffold.swapmode.invswitch": "背包切换",
   "lumin.modules.scaffold.swapmode.silent": "静默",
   "lumin.modules.scaffold.swapback": "停用还原",
   "lumin.modules.scaffold.swinghand": "挥手",
@@ -127,5 +127,6 @@
   "lumin.modules.clickgui.blurstrength": "模糊强度",
   "lumin.modules.clickgui.blurmode": "模糊方式",
   "lumin.modules.clickgui.blurmode.fullscreen": "全屏",
-  "lumin.modules.clickgui.blurmode.onlysidebar": "仅侧边栏"
+  "lumin.modules.clickgui.blurmode.onlysidebar": "仅侧边栏",
+  "lumin.gui.gameaccount": "游戏账号"
 }
