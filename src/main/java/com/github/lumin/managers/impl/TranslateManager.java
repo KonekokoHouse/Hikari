@@ -7,18 +7,11 @@ import java.util.List;
 
 public class TranslateManager {
 
-    private static TranslateManager INSTANCE = null;
-    private List<TranslateComponent> components = new ArrayList<>();
+    public static TranslateManager INSTANCE = new TranslateManager();
+
+    private final List<TranslateComponent> components = new ArrayList<>();
 
     private TranslateManager() {
-
-    }
-
-    public static TranslateManager getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new TranslateManager();
-        }
-        return INSTANCE;
     }
 
     public void refresh() {

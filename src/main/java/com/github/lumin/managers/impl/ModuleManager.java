@@ -13,9 +13,11 @@ import com.mojang.blaze3d.platform.InputConstants;
 import java.util.List;
 
 public class ModuleManager {
+    public static final ModuleManager INSTANCE = new ModuleManager();
+
     private List<Module> modules;
 
-    public ModuleManager() {
+    private ModuleManager() {
         initModules();
     }
 
