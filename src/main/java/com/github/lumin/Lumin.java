@@ -1,5 +1,6 @@
 package com.github.lumin;
 
+import com.github.lumin.assets.i18n.I18NFileGenerator;
 import com.github.lumin.managers.Managers;
 import com.github.lumin.utils.AuthUtils;
 import com.mojang.logging.LogUtils;
@@ -90,6 +91,8 @@ public class Lumin {
         LOGGER.info("Welcome to Lumin, Meow~");
 
         Managers.initManagers();
+
+        I18NFileGenerator.generate("lumin-config/empty.json");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             Managers.CONFIG.saveNow();
