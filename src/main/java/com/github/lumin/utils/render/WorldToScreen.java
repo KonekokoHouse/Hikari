@@ -1,5 +1,7 @@
 package com.github.lumin.utils.render;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
@@ -7,7 +9,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
 import org.joml.Vector4d;
 import org.joml.Vector4f;
 
@@ -19,15 +20,17 @@ public final class WorldToScreen {
     private static final Minecraft mc = Minecraft.getInstance();
 
     public static Vector4d getEntityPositionsOn2D(LivingEntity target, float tickDelta) {
-        int[] viewport = new int[]{0, 0, mc.getWindow().getWidth(), mc.getWindow().getHeight()};
-        Matrix4f projectionMatrix = createProjectionMatrix(tickDelta);
+        final int[] viewport = new int[]{0, 0, mc.getWindow().getWidth(), mc.getWindow().getHeight()};
+        final PoseStack matrixStack = createMatrixStack(tickDelta);
 
-        Vec3 position = interpolate(target, tickDelta);
+        final Matrix4f projectionMatrix = matrixStack.last().pose();
 
-        float width = target.getBbWidth() / 2f;
-        float height = target.getBbHeight() + (target.isCrouching() ? 0.1f : 0.2f);
+        final Vec3 position = interpolate(target, tickDelta);
 
-        AABB boundingBox = new AABB(
+        final float width = target.getBbWidth() / 2f;
+        final float height = target.getBbHeight() + (target.isCrouching() ? 0.1f : 0.2f);
+
+        final AABB boundingBox = new AABB(
                 position.x - width,
                 position.y,
                 position.z - width,
@@ -36,7 +39,7 @@ public final class WorldToScreen {
                 position.z + width
         );
 
-        Vector4d projection = projectEntity(viewport, projectionMatrix, boundingBox);
+        final Vector4d projection = projectEntity(viewport, projectionMatrix, boundingBox);
 
         projection.div(mc.getWindow().getGuiScale());
 
@@ -53,7 +56,7 @@ public final class WorldToScreen {
         Vector4d projected = null;
 
         for (final Vec3 pos : list) {
-            matrix.project((float) pos.x, (float) pos.y, (float) pos.z, viewport, windowCoords);
+            matrix.project(pos.toVector3f(), viewport, windowCoords);
             windowCoords.y = viewport[3] - windowCoords.y;
 
             if (windowCoords.w != 1) {
@@ -76,18 +79,22 @@ public final class WorldToScreen {
         return projected;
     }
 
-    public static Matrix4f createProjectionMatrix(final float tickDelta) {
-        Matrix4fStack matrixStack = new Matrix4fStack();
-        net.minecraft.client.Camera camera = mc.gameRenderer.getMainCamera();
-
+    private static PoseStack createMatrixStack(final float tickDelta) {
+        PoseStack poseStack = new PoseStack();
+        final Camera camera = mc.gameRenderer.getMainCamera();
         float fov = mc.gameRenderer.getFov(camera, tickDelta, true);
 
-        matrixStack.mul(mc.gameRenderer.getProjectionMatrix(fov));
+        poseStack.mulPose(mc.gameRenderer.getProjectionMatrix(fov));
 
-        matrixStack.rotateX((float) Math.toRadians(camera.xRot()));
-        matrixStack.rotateY((float) Math.toRadians(camera.yRot() + 180.0f));
+        mc.gameRenderer.bobHurt(poseStack, camera.getPartialTickTime());
 
-        return matrixStack;
+        if (mc.options.bobView().get()) {
+            mc.gameRenderer.bobView(poseStack, camera.getPartialTickTime());
+        }
+
+        poseStack.mulPose(Axis.XP.rotationDegrees(camera.xRot()));
+        poseStack.mulPose(Axis.YP.rotationDegrees(camera.yRot() + 180.0f));
+        return poseStack;
     }
 
     public static List<Vec3> getBoxBounds(final AABB boundingBox) {
@@ -103,24 +110,9 @@ public final class WorldToScreen {
         );
     }
 
-    public static Vec3 interpolate(final LivingEntity entity, final float tickDelta) {
-        Camera camera = mc.gameRenderer.getMainCamera();
+    private static Vec3 interpolate(final LivingEntity entity, final float tickDelta) {
+        final Camera camera = mc.gameRenderer.getMainCamera();
         return entity.position().add(Mth.lerp(tickDelta, entity.xOld, entity.getX()) - entity.getX(), Mth.lerp(tickDelta, entity.yOld, entity.getY()) - entity.getY(), Mth.lerp(tickDelta, entity.zOld, entity.getZ()) - entity.getZ()).subtract(camera.position());
-    }
-
-    public static Vector4d getHeadPositionOn2D(LivingEntity target, float tickDelta) {
-        int[] viewport = new int[]{0, 0, mc.getWindow().getWidth(), mc.getWindow().getHeight()};
-        Matrix4f projectionMatrix = createProjectionMatrix(tickDelta);
-
-        Vec3 position = interpolate(target, tickDelta);
-        Vec3 headPos = position.add(0.0, target.getBbHeight() + 0.35, 0.0);
-
-        final Vector4f windowCoords = new Vector4f();
-        projectionMatrix.project((float) headPos.x, (float) headPos.y, (float) headPos.z, viewport, windowCoords);
-        windowCoords.y = viewport[3] - windowCoords.y;
-
-        double guiScale = mc.getWindow().getGuiScale();
-        return new Vector4d(windowCoords.x / guiScale, windowCoords.y / guiScale, 0, 0);
     }
 
 }

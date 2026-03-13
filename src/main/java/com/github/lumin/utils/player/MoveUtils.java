@@ -2,7 +2,6 @@ package com.github.lumin.utils.player;
 
 import com.github.lumin.utils.math.MathUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.ClientInput;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;

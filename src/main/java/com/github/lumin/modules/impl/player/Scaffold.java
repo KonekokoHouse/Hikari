@@ -7,8 +7,8 @@ import com.github.lumin.modules.Category;
 import com.github.lumin.modules.Module;
 import com.github.lumin.settings.impl.BoolSetting;
 import com.github.lumin.settings.impl.ColorSetting;
-import com.github.lumin.settings.impl.IntSetting;
 import com.github.lumin.settings.impl.EnumSetting;
+import com.github.lumin.settings.impl.IntSetting;
 import com.github.lumin.utils.math.MathUtils;
 import com.github.lumin.utils.player.FindItemResult;
 import com.github.lumin.utils.player.InvUtils;
@@ -32,7 +32,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -183,7 +182,8 @@ public class Scaffold extends Module {
                     InvUtils.invSwapBack();
                 }
             }
-            default -> {}
+            default -> {
+            }
         }
     }
 
@@ -281,7 +281,8 @@ public class Scaffold extends Module {
             }
             case SwapMode.Silent -> swapped = InvUtils.swap(item.slot(), true);
             case SwapMode.HotbarSwitch -> invSwapped = InvUtils.invSwap(item.slot());
-            default -> {}
+            default -> {
+            }
         }
 
         boolean hasRotated = RaytraceUtils.overBlock(Managers.ROTATION.getRotation(), blockInfo.dir, blockInfo.position, sideCheck.getValue());

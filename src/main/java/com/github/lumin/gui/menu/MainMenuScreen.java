@@ -1,5 +1,6 @@
 package com.github.lumin.gui.menu;
 
+import com.github.lumin.assets.resources.ResourceLocationUtils;
 import com.github.lumin.graphics.LuminTexture;
 import com.github.lumin.graphics.renderers.RectRenderer;
 import com.github.lumin.graphics.renderers.RoundRectRenderer;
@@ -7,7 +8,6 @@ import com.github.lumin.graphics.renderers.TextRenderer;
 import com.github.lumin.graphics.renderers.TextureRenderer;
 import com.github.lumin.utils.render.animation.Animation;
 import com.github.lumin.utils.render.animation.Easing;
-import com.github.lumin.assets.resources.ResourceLocationUtils;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;

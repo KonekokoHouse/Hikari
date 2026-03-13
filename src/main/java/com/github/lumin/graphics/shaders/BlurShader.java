@@ -1,4 +1,4 @@
-package com.github.lumin.graphics.renderers;
+package com.github.lumin.graphics.shaders;
 
 import com.github.lumin.graphics.LuminRenderPipelines;
 import com.github.lumin.graphics.LuminRenderSystem;
@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
-public class BlurRenderer implements AutoCloseable {
+public class BlurShader implements AutoCloseable {
 
-    public static final BlurRenderer INSTANCE = new BlurRenderer();
+    public static final BlurShader INSTANCE = new BlurShader();
 
     private final Minecraft mc = Minecraft.getInstance();
     private final List<RenderTarget> targets = new ArrayList<>();
@@ -38,22 +38,16 @@ public class BlurRenderer implements AutoCloseable {
     private GpuSampler linearSampler;
     private int lastWidth, lastHeight;
 
-    public BlurRenderer() {
+    public BlurShader() {
         initBuffers();
     }
 
     private void initBuffers() {
-        // Init Quad Buffer (Position + TexCoord)
-        // 4 vertices * 20 bytes (3 floats pos + 2 floats tex)
         ByteBuffer buffer = MemoryUtil.memAlloc(80);
 
-        // Vertex 0: -1, -1, 0, 0, 0
         buffer.putFloat(-1f).putFloat(-1f).putFloat(0f).putFloat(0f).putFloat(0f);
-        // Vertex 1: 1, -1, 0, 1, 0
         buffer.putFloat(1f).putFloat(-1f).putFloat(0f).putFloat(1f).putFloat(0f);
-        // Vertex 2: 1, 1, 0, 1, 1
         buffer.putFloat(1f).putFloat(1f).putFloat(0f).putFloat(1f).putFloat(1f);
-        // Vertex 3: -1, 1, 0, 0, 1
         buffer.putFloat(-1f).putFloat(1f).putFloat(0f).putFloat(0f).putFloat(1f);
 
         buffer.flip();
@@ -280,10 +274,10 @@ public class BlurRenderer implements AutoCloseable {
             MemoryUtil.memFree(uniformBuf);
 
             GpuBufferSlice dynamicUniforms = RenderSystem.getDynamicUniforms().writeTransform(
-                    new Matrix4f(), // Identity ModelView
+                    new Matrix4f(),
                     new Vector4f(1, 1, 1, 1),
                     new Vector3f(0, 0, 0),
-                    new Matrix4f() // Identity Texture
+                    new Matrix4f()
             );
 
             try (RenderPass pass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(

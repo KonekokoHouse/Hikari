@@ -1,6 +1,7 @@
 package com.github.lumin.gui.clickgui.panel;
 
 import com.github.lumin.graphics.renderers.*;
+import com.github.lumin.graphics.shaders.BlurShader;
 import com.github.lumin.gui.IComponent;
 import com.github.lumin.modules.impl.client.ClickGui;
 import net.minecraft.client.Minecraft;
@@ -46,7 +47,7 @@ public class Panel implements IComponent {
 
         if (ClickGui.INSTANCE.blurMode.is("全屏")) {
             if (ClickGui.INSTANCE.backgroundBlur.getValue()) {
-                BlurRenderer.INSTANCE.drawBlur(0.0f, 0.0f, screenWidth, screenHeight, 0.0f, ClickGui.INSTANCE.blurStrength.getValue().floatValue());
+                BlurShader.INSTANCE.drawBlur(0.0f, 0.0f, screenWidth, screenHeight, 0.0f, ClickGui.INSTANCE.blurStrength.getValue().floatValue());
             }
         }
 

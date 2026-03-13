@@ -110,8 +110,7 @@ public class Nametags extends Module {
             float dist = (float) playerPos.distanceTo(cameraPos);
             if (dist > 256) continue;
 
-            Vector4d screenPos = WorldToScreen.getHeadPositionOn2D(player, partialTick);
-            if (screenPos == null) continue;
+            Vector4d screenPos = WorldToScreen.getEntityPositionsOn2D(player, partialTick);
 
             float screenX = (float) screenPos.x;
             float screenY = (float) screenPos.y;

@@ -9,7 +9,6 @@ import com.github.lumin.modules.Module;
 import com.github.lumin.settings.impl.BoolSetting;
 import com.github.lumin.settings.impl.ColorSetting;
 import com.github.lumin.settings.impl.DoubleSetting;
-import com.github.lumin.settings.impl.EnumSetting;
 import com.google.common.base.Suppliers;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
@@ -88,7 +87,7 @@ public class ModuleList extends Module {
             float textX = textBoxX + 4.0f * moduleScale - 1.5f;
             float textY = boxY + (item.boxHeight() - textRenderer.getHeight(moduleScale)) / 5.0f;
 //            if ("中文".equals(language.getValue())) {
-                textRenderer.addGlowingText(item.text(), textX + 1, textY, moduleScale, new Color(255, 255, 255, 126), glowRadius.getValue().floatValue(), glowIntensity.getValue().intValue());
+            textRenderer.addGlowingText(item.text(), textX + 1, textY, moduleScale, new Color(255, 255, 255, 126), glowRadius.getValue().floatValue(), glowIntensity.getValue().intValue());
 //            } else {
 //                textRenderer.addGlowingText(item.text(), textX + 0.7f, textY - 0.5f, moduleScale, new Color(255, 255, 255, 126), glowRadius.getValue().floatValue(), glowIntensity.getValue().intValue());
 //            }
@@ -114,7 +113,6 @@ public class ModuleList extends Module {
 
     private int getTextWidth(Module module) {
         TextRenderer textRenderer = textRendererSupplier.get();
-//        String text = "中文".equals(language.getValue()) ? module.getCnName() : module.getDescription();
         String text = module.getName();
         if (showCategory.getValue()) {
             text += " [" + module.category.getName() + "]";

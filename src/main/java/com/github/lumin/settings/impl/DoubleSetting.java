@@ -34,8 +34,19 @@ public class DoubleSetting extends Setting<Double> {
         super.setValue(Mth.clamp(value, min, max));
     }
 
-    public double getMin() { return min; }
-    public double getMax() { return max; }
-    public double getStep() { return step; }
-    public boolean isPercentageMode() { return percentageMode; }
+    public double getMin() {
+        return min;
+    }
+
+    public double getMax() {
+        return max;
+    }
+
+    public double getStep() {
+        return step;
+    }
+
+    public boolean isPercentageMode() {
+        return percentageMode;
+    }
 }

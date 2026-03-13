@@ -1,6 +1,6 @@
 package com.github.lumin.managers.impl;
 
-import com.github.lumin.events.JumpRotationEvent;
+import com.github.lumin.events.JumpEvent;
 import com.github.lumin.events.MotionEvent;
 import com.github.lumin.events.RayTraceEvent;
 import com.github.lumin.events.StrafeEvent;
@@ -235,7 +235,7 @@ public class RotationManager {
     }
 
     @SubscribeEvent
-    private void onJump(JumpRotationEvent event) {
+    private void onJump(JumpEvent event) {
         if (active && correctMovement == MovementFix.ON && rotations != null) {
             event.setYaw(rotations.x);
         }

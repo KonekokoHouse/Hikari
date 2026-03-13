@@ -10,19 +10,18 @@ import net.neoforged.bus.api.SubscribeEvent;
 import java.util.Random;
 
 public class Disabler extends Module {
+
     public static final Disabler INSTANCE = new Disabler();
-    private final BoolSetting DuplicateRotPlace = boolSetting("DuplicateRotPlace", true);
-    private final BoolSetting aim360 = boolSetting("AimModulo360", false);
-    private final BoolSetting AimDuplicateLook = boolSetting("AimDuplicateLook", false);
 
     private Disabler() {
         super("残疾人", "Disabler", Category.PLAYER);
     }
 
-    private float playerYaw;
-    private float deltaYaw;
-    float lastYaw, lastPitch = 0;
-    private float lastPlacedDeltaYaw;
+    private final BoolSetting DuplicateRotPlace = boolSetting("DuplicateRotPlace", true);
+    private final BoolSetting aim360 = boolSetting("AimModulo360", false);
+    private final BoolSetting AimDuplicateLook = boolSetting("AimDuplicateLook", false);
+
+    private float playerYaw, lastYaw, lastPitch = 0;
 
     @SubscribeEvent
     public void onPacket(PacketEvent.Send event) {
@@ -58,10 +57,9 @@ public class Disabler extends Module {
 
                     float lastPlayerYaw = this.playerYaw;
                     this.playerYaw = packet.getYRot(0.0F);
-                    this.deltaYaw = Math.abs(this.playerYaw - lastPlayerYaw);
 
-                    if (this.deltaYaw > 2.0F) {
-                        float xDiff = Math.abs(this.deltaYaw - this.lastPlacedDeltaYaw);
+                    float deltaYaw = Math.abs(this.playerYaw - lastPlayerYaw);
+                    if (deltaYaw > 2.0F) {
                         Random random = new Random();
                         float perturbation = 0.005f + random.nextFloat() * 0.015f;
                         if (random.nextBoolean()) {
@@ -69,11 +67,10 @@ public class Disabler extends Module {
                         } else {
                             packet.yRot = packet.getYRot(0) - perturbation;
                         }
-
-                        this.lastPlacedDeltaYaw = this.deltaYaw;
                     }
                 }
             }
         }
     }
+
 }

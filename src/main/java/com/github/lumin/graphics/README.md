@@ -10,8 +10,10 @@ Lumin Graphics is a lightweight, high-performance rendering framework designed f
 
 ## Core Features
 
-* **SDF Rounded Rectangles**: Smooth, anti-aliased corners calculated via fragment shaders. Supports dynamic radii without modifying vertex data.
-* **High-Performance TTF**: Advanced TrueType Font rendering utilizing an atlas-based batching mechanism to significantly reduce Draw Calls.
+* **SDF Rounded Rectangles**: Smooth, anti-aliased corners calculated via fragment shaders. Supports dynamic radii
+  without modifying vertex data.
+* **High-Performance TTF**: Advanced TrueType Font rendering utilizing an atlas-based batching mechanism to
+  significantly reduce Draw Calls.
 
 ---
 
@@ -19,18 +21,19 @@ Lumin Graphics is a lightweight, high-performance rendering framework designed f
 
 ### Lifecycle Synchronization Constraints
 
-Within a single frame's render loop, avoid calling `Renderer.clear()` 
-and then `draw()` again on the same instance after one or more 
-`Renderer.draw()` calls have already been executed. Doing so will lead 
-to multiple buffer allocations within a single frame, reducing the 
+Within a single frame's render loop, avoid calling `Renderer.clear()`
+and then `draw()` again on the same instance after one or more
+`Renderer.draw()` calls have already been executed. Doing so will lead
+to multiple buffer allocations within a single frame, reducing the
 effectiveness of **In-Flight** optimizations.
 
-If your logic requirements necessitate multiple cycles of clearing and 
+If your logic requirements necessitate multiple cycles of clearing and
 drawing within a single frame:
 
 **It is recommended to instantiate a new `Renderer` to handle subsequent tasks.**
 
-**💡 NOTE**: Please avoid creating excessive `Renderer` instances, as this may lead to over-allocation of VRAM. Alternatively, you can specify a smaller buffer size than the default value when instantiating a `Renderer`.
+**💡 NOTE**: Please avoid creating excessive `Renderer` instances, as this may lead to over-allocation of VRAM.
+Alternatively, you can specify a smaller buffer size than the default value when instantiating a `Renderer`.
 
 ---
 
@@ -47,7 +50,8 @@ All rendering operations in Lumin Graphics are performed through specialized **R
 
 ### Initialization & Thread Safety
 
-Renderers **must** be initialized on the **Render Thread**. We recommend using `Suppliers.memoize` (from Guava or Minecraft libraries) to ensure safe and lazy initialization.
+Renderers **must** be initialized on the **Render Thread**. We recommend using `Suppliers.memoize` (from Guava or
+Minecraft libraries) to ensure safe and lazy initialization.
 
 ```java
 // Recommended initialization method
@@ -81,7 +85,8 @@ rectRenderer.get().drawAndClear();
 
 #### 2. Buffer Reusability
 
-If your UI content does not change every frame, you can add vertices once and draw them multiple times in subsequent frames, thereby saving CPU overhead.
+If your UI content does not change every frame, you can add vertices once and draw them multiple times in subsequent
+frames, thereby saving CPU overhead.
 
 ```java
 // During the initialization phase or the first frame:
@@ -96,13 +101,15 @@ rectRenderer.get().draw(); // Content remains in the GPU buffer until .clear() i
 
 ### 💡 Optimization Tips
 
-When using **Lumin Graphics**, keep in mind: calling `.draw()` multiple times without calling `.clear()` is extremely efficient. It simply re-triggers the draw command for existing GPU data without the need to re-upload vertex data.
+When using **Lumin Graphics**, keep in mind: calling `.draw()` multiple times without calling `.clear()` is extremely
+efficient. It simply re-triggers the draw command for existing GPU data without the need to re-upload vertex data.
 
 ---
 
 ## License
 
-* **Lumin Graphics**: The core rendering components (located in `src/main/java/com/github/lumin/graphics/`) are licensed under the [MIT License](https://www.google.com/search?q=LICENSE).
+* **Lumin Graphics**: The core rendering components (located in `src/main/java/com/github/lumin/graphics/`) are licensed
+  under the [MIT License](https://www.google.com/search?q=LICENSE).
 
 ---
 

@@ -1,7 +1,7 @@
 package com.github.lumin.settings.impl;
 
-import com.github.lumin.settings.Setting;
 import com.github.lumin.modules.Module;
+import com.github.lumin.settings.Setting;
 
 public class StringSetting extends Setting<String> {
 

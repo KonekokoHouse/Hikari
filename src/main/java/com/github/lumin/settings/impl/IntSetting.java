@@ -34,8 +34,19 @@ public class IntSetting extends Setting<Integer> {
         super.setValue(Mth.clamp(value, min, max));
     }
 
-    public int getMin() { return min; }
-    public int getMax() { return max; }
-    public int getStep() { return step; }
-    public boolean isPercentageMode() { return percentageMode; }
+    public int getMin() {
+        return min;
+    }
+
+    public int getMax() {
+        return max;
+    }
+
+    public int getStep() {
+        return step;
+    }
+
+    public boolean isPercentageMode() {
+        return percentageMode;
+    }
 }

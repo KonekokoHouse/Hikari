@@ -20,6 +20,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AntiBot extends Module {
+
     public static final AntiBot INSTANCE = new AntiBot();
 
     private AntiBot() {
@@ -74,4 +75,5 @@ public class AntiBot extends Module {
             }
         }
     }
+
 }

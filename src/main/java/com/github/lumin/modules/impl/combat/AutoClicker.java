@@ -3,12 +3,12 @@ package com.github.lumin.modules.impl.combat;
 import com.github.lumin.modules.Category;
 import com.github.lumin.modules.Module;
 import com.github.lumin.settings.impl.BoolSetting;
-import com.github.lumin.settings.impl.IntSetting;
 import com.github.lumin.settings.impl.EnumSetting;
+import com.github.lumin.settings.impl.IntSetting;
+import com.github.lumin.utils.math.MathUtils;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 
 public class AutoClicker extends Module {
@@ -36,9 +36,7 @@ public class AutoClicker extends Module {
     public void onTick(ClientTickEvent.Pre event) {
         if (nullCheck()) return;
 
-        // Check if left mouse button is held down
         boolean shouldClick = mc.mouseHandler.isLeftPressed();
-
         if (autoAttack.getValue() && mc.hitResult != null && mc.hitResult.getType() == HitResult.Type.ENTITY) {
             shouldClick = true;
         }
@@ -65,18 +63,12 @@ public class AutoClicker extends Module {
                 }
             } else {
                 if (System.currentTimeMillis() - lastClickTime >= nextDelay) {
-                    // Perform click
                     performClick();
-
-                    // Update last click time
                     lastClickTime = System.currentTimeMillis();
-
-                    // Calculate next delay based on CPS
                     updateNextDelay();
                 }
             }
         } else {
-            // Reset delay if not clicking
             lastClickTime = 0;
             readyTime = 0;
         }
@@ -97,18 +89,7 @@ public class AutoClicker extends Module {
     }
 
     private void updateNextDelay() {
-        int min = minCPS.getValue();
-        int max = maxCPS.getValue();
-        if (min > max) {
-            int temp = min;
-            min = max;
-            max = temp;
-        }
-
-        // CPS to delay (ms)
-        // Add some randomness
-        double cps = min + (Math.random() * (max - min));
-        nextDelay = (long) (1000 / cps);
+        nextDelay = 1000 / MathUtils.getRandom(minCPS.getValue(), maxCPS.getValue());
     }
 
     private enum Mode {

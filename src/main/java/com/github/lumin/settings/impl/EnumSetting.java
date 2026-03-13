@@ -3,6 +3,7 @@ package com.github.lumin.settings.impl;
 import com.github.lumin.assets.i18n.TranslateComponent;
 import com.github.lumin.modules.Module;
 import com.github.lumin.settings.Setting;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -57,5 +58,7 @@ public class EnumSetting<E extends Enum<E>> extends Setting<E> {
         return -1;
     }
 
-    public E[] getModes() { return constants; }
+    public E[] getModes() {
+        return constants;
+    }
 }

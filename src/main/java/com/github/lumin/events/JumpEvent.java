@@ -2,10 +2,11 @@ package com.github.lumin.events;
 
 import net.neoforged.bus.api.Event;
 
-public class JumpRotationEvent extends Event {
+public class JumpEvent extends Event {
+
     private float yaw;
 
-    public JumpRotationEvent(float yaw) {
+    public JumpEvent(float yaw) {
         this.yaw = yaw;
     }
 
@@ -16,4 +17,5 @@ public class JumpRotationEvent extends Event {
     public void setYaw(float yaw) {
         this.yaw = yaw;
     }
+
 }

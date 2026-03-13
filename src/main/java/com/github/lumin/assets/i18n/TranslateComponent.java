@@ -9,14 +9,14 @@ public class TranslateComponent {
     public final String suffix;
     public final String fullKey;
     public final String fullKeyWithoutLumin;
-    
+
     private TranslateComponent(String prefix, String suffix) {
         this.prefix = prefix;
         this.suffix = suffix;
         this.fullKey = LUMIN_PREFIX + "." + prefix + "." + suffix;
         this.fullKeyWithoutLumin = prefix + "." + suffix;
     }
-    
+
     private String cachedName;
 
     public static String LUMIN_PREFIX = "lumin";
@@ -26,7 +26,7 @@ public class TranslateComponent {
         TranslateManager.INSTANCE.registerTranslateComponent(component);
         return component;
     }
-    
+
     public String getTranslatedName() {
         if (cachedName == null) {
             cachedName = I18n.get(fullKey);

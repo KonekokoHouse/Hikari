@@ -60,7 +60,6 @@ public class AimAssist extends Module {
 
         playerRotation = new Vector2f(mc.player.getYRot(), mc.player.getXRot());
 
-        // Check ignore conditions
         if (ignoreScreen.getValue() && mc.screen != null) {
             targetRotation = null;
             return;
@@ -73,10 +72,7 @@ public class AimAssist extends Module {
         currentTarget = findTarget();
 
         if (currentTarget != null) {
-            // Calculate ideal rotation to target
             Vector2f idealRotation = RotationUtils.calculate(currentTarget, true, range.getValue());
-
-            // Process smoothing
             AngleSmooth smoother = getAngleSmooth();
             targetRotation = smoother.process(playerRotation, idealRotation);
         } else {
@@ -133,7 +129,7 @@ public class AimAssist extends Module {
         targets.sort(Comparator.comparingDouble(RotationUtils::getEyeDistanceToEntity));
 
         if (targets.isEmpty()) return null;
-        return targets.get(0);
+        return targets.getFirst();
     }
 
     private boolean isValidTarget(LivingEntity entity) {
@@ -155,7 +151,6 @@ public class AimAssist extends Module {
         };
     }
 
-    // Inner classes for Smoothing logic
     private interface AngleSmooth {
         Vector2f process(Vector2f current, Vector2f target);
     }

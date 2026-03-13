@@ -1,6 +1,6 @@
 package com.github.lumin.mixins;
 
-import com.github.lumin.events.JumpRotationEvent;
+import com.github.lumin.events.JumpEvent;
 import com.github.lumin.managers.Managers;
 import com.github.lumin.modules.impl.player.JumpCooldown;
 import net.minecraft.client.Minecraft;
@@ -22,7 +22,7 @@ public abstract class MixinLivingEntity {
     @Redirect(method = "jumpFromGround", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getYRot()F"))
     private float redirectGetYRotInJumpFromGround(LivingEntity instance) {
         if (instance == Minecraft.getInstance().player) {
-            JumpRotationEvent event = NeoForge.EVENT_BUS.post(new JumpRotationEvent(instance.getYRot()));
+            JumpEvent event = NeoForge.EVENT_BUS.post(new JumpEvent(instance.getYRot()));
             return event.getYaw();
         }
         return instance.getYRot();
