@@ -297,9 +297,9 @@ public class ContentPanel implements IComponent {
         }
 
         float pxScale = (float) mc.getWindow().getGuiScale();
-        int scX = Mth.clamp(Mth.floor(lastListX * pxScale), 0, mc.getWindow().getWidth());
+        int scX = Mth.clamp(Mth.floor((lastListX - padding) * pxScale), 0, mc.getWindow().getWidth());
         int scY = Mth.clamp(Mth.floor((mc.getWindow().getGuiScaledHeight() - (lastListY + lastListH)) * pxScale), 0, mc.getWindow().getHeight());
-        int scW = Mth.clamp(Mth.ceil(lastListW * pxScale), 0, mc.getWindow().getWidth() - scX);
+        int scW = Mth.clamp(Mth.ceil((lastListW + padding * 2) * pxScale), 0, mc.getWindow().getWidth() - scX);
         int scH = Mth.clamp(Mth.ceil(lastListH * pxScale), 0, mc.getWindow().getHeight() - scY);
         listRoundRect.setScissor(scX, scY, scW, scH);
         listFont.setScissor(scX, scY, scW, scH);
