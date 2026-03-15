@@ -99,8 +99,8 @@ public class ModuleComponent implements IComponent {
 
     private Component createSettingComponent(Setting<?> setting) {
         if (setting instanceof BoolSetting boolValue) return new BoolSettingComponent(boolValue);
-        if (setting instanceof IntSetting intSetting) return new IntSettingComponent(intSetting);
-        if (setting instanceof DoubleSetting doubleSetting) return new DoubleSettingComponent(doubleSetting);
+        if (setting instanceof IntSetting intSetting) return new NumberSettingComponent(intSetting);
+        if (setting instanceof DoubleSetting doubleSetting) return new NumberSettingComponent(doubleSetting);
         if (setting instanceof EnumSetting enumSetting) return new EnumSettingComponent(enumSetting);
         if (setting instanceof ColorSetting colorSetting) return new ColorSettingComponent(colorSetting);
         if (setting instanceof StringSetting stringSetting) return new StringSettingComponent(stringSetting);
@@ -271,11 +271,18 @@ public class ModuleComponent implements IComponent {
         if (detailProgress > 0.01f) {
             float bgBottom = animY + animH;
             int visibleSettingIndex = 0;
+            int totalVisible = getFilteredVisibleCount();
+            float maxDelay = Math.min(0.3f, Math.max(0.0f, (totalVisible - 1) * 0.02f));
             for (Component setting : settings) {
                 if (!isSettingVisible(setting)) continue;
                 if (cursorY + rowH > bgBottom) break;
-                float rowDelay = 0.06f;
-                float rowProgress = Mth.clamp((detailProgress - visibleSettingIndex * rowDelay) / (1.0f - rowDelay), 0.0f, 1.0f);
+                float rowDelay = 0.02f;
+                float rowProgress;
+                if (detailProgress >= 1.0f || maxDelay <= 0.0f) {
+                    rowProgress = 1.0f;
+                } else {
+                    rowProgress = Mth.clamp((detailProgress - visibleSettingIndex * rowDelay) / (1.0f - maxDelay), 0.0f, 1.0f);
+                }
                 if (rowProgress <= 0.0f) {
                     cursorY += rowH + rowGap;
                     visibleSettingIndex++;
@@ -399,9 +406,8 @@ public class ModuleComponent implements IComponent {
 
     public boolean hasDraggingSetting() {
         return anyVisibleSetting(setting -> {
-            if (setting instanceof IntSettingComponent intSettingComponent) return intSettingComponent.isDragging();
-            if (setting instanceof DoubleSettingComponent doubleSettingComponent)
-                return doubleSettingComponent.isDragging();
+            if (setting instanceof NumberSettingComponent numberSettingComponent)
+                return numberSettingComponent.isDragging();
             return false;
         });
     }
@@ -515,8 +521,11 @@ public class ModuleComponent implements IComponent {
 
     private boolean isSettingAvailable(Component component) {
         if (component instanceof BoolSettingComponent c) return c.getSetting().isAvailable();
-        if (component instanceof IntSettingComponent c) return c.getSetting().isAvailable();
-        if (component instanceof DoubleSettingComponent c) return c.getSetting().isAvailable();
+        if (component instanceof NumberSettingComponent c) {
+            Object s = c.getSetting();
+            if (s instanceof IntSetting is) return is.isAvailable();
+            if (s instanceof DoubleSetting ds) return ds.isAvailable();
+        }
         if (component instanceof EnumSettingComponent c) return c.getSetting().isAvailable();
         if (component instanceof ColorSettingComponent c) return c.getSetting().isAvailable();
         if (component instanceof StringSettingComponent c) return c.getSetting().isAvailable();
@@ -525,8 +534,11 @@ public class ModuleComponent implements IComponent {
 
     private String getSettingDisplayName(Component component) {
         if (component instanceof BoolSettingComponent c) return c.getSetting().getDisplayName();
-        if (component instanceof IntSettingComponent c) return c.getSetting().getDisplayName();
-        if (component instanceof DoubleSettingComponent c) return c.getSetting().getDisplayName();
+        if (component instanceof NumberSettingComponent c) {
+            Object s = c.getSetting();
+            if (s instanceof IntSetting is) return is.getDisplayName();
+            if (s instanceof DoubleSetting ds) return ds.getDisplayName();
+        }
         if (component instanceof EnumSettingComponent c) return c.getSetting().getDisplayName();
         if (component instanceof ColorSettingComponent c) return c.getSetting().getDisplayName();
         if (component instanceof StringSettingComponent c) return c.getSetting().getDisplayName();

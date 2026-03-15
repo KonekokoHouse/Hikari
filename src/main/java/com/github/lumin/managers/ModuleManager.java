@@ -49,7 +49,7 @@ public class ModuleManager {
 
                 // Render
                 ESP.INSTANCE,
-                FullBright.INSTANCE,
+                Fullbright.INSTANCE,
                 HUD.INSTANCE,
                 ModuleList.INSTANCE,
                 Nametags.INSTANCE,

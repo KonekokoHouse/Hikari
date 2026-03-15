@@ -320,7 +320,7 @@ public final class ListViewController {
         return new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (color.getAlpha() * alpha));
     }
 
-    record OpenRequest(Module module, float sourceX, float sourceY, float sourceW, float sourceH) {
+    public record OpenRequest(Module module, float sourceX, float sourceY, float sourceW, float sourceH) {
     }
 
     private static final class ModuleCard {

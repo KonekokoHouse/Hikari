@@ -147,7 +147,7 @@ final class SettingsViewController {
 
         settingsComponent.setFilterText(searchText);
         int itemCount = settingsComponent.getFilteredVisibleCount();
-        float titleH = set.font().getHeight(1.15f * guiScale);
+        float titleH = 18.0f * guiScale;
         float contentH = 8.0f * guiScale + titleH + 6.0f * guiScale + (itemCount > 0 ? itemCount * 18.0f * guiScale + Math.max(0, itemCount - 1) * 4.0f * guiScale : 0) + 8.0f * guiScale;
 
         maxScroll = Math.max(0.0f, contentH - lastSettingsH);

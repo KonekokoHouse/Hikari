@@ -2,6 +2,7 @@ package com.github.lumin.gui.clickgui.component.impl;
 
 import com.github.lumin.gui.Component;
 import com.github.lumin.settings.impl.DoubleSetting;
+import com.github.lumin.settings.impl.IntSetting;
 import com.github.lumin.utils.render.MouseUtils;
 import com.github.lumin.utils.render.animation.Animation;
 import com.github.lumin.utils.render.animation.Easing;
@@ -15,8 +16,9 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class DoubleSettingComponent extends Component {
-    private final DoubleSetting setting;
+public class NumberSettingComponent extends Component {
+    private final Object setting;
+    private final boolean isDouble;
     private boolean dragging;
     private boolean editing;
     private String editText = "";
@@ -32,15 +34,25 @@ public class DoubleSettingComponent extends Component {
     private float lastSliderHitY;
     private float lastSliderHitH;
 
-    public DoubleSettingComponent(DoubleSetting setting) {
+    public NumberSettingComponent(IntSetting setting) {
         this.setting = setting;
-        float initial = getPercent(setting.getValue(), setting.getMin(), setting.getMax());
+        this.isDouble = false;
+        float initial = getPercentInt(setting.getValue(), setting.getMin(), setting.getMax());
         sliderAnimation.setStartValue(initial);
         interactionAnimation.setStartValue(0.0f);
         editingAnimation.setStartValue(0.0f);
     }
 
-    public DoubleSetting getSetting() {
+    public NumberSettingComponent(DoubleSetting setting) {
+        this.setting = setting;
+        this.isDouble = true;
+        float initial = getPercentDouble(setting.getValue(), setting.getMin(), setting.getMax());
+        sliderAnimation.setStartValue(initial);
+        interactionAnimation.setStartValue(0.0f);
+        editingAnimation.setStartValue(0.0f);
+    }
+
+    public Object getSetting() {
         return setting;
     }
 
@@ -48,9 +60,38 @@ public class DoubleSettingComponent extends Component {
         return dragging;
     }
 
+    private double getMin() {
+        return isDouble ? ((DoubleSetting) setting).getMin() : ((IntSetting) setting).getMin();
+    }
+
+    private double getMax() {
+        return isDouble ? ((DoubleSetting) setting).getMax() : ((IntSetting) setting).getMax();
+    }
+
+    private double getStep() {
+        return isDouble ? ((DoubleSetting) setting).getStep() : ((IntSetting) setting).getStep();
+    }
+
+    private boolean isPercentageMode() {
+        return isDouble ? ((DoubleSetting) setting).isPercentageMode() : ((IntSetting) setting).isPercentageMode();
+    }
+
+    private double getValue() {
+        return isDouble ? ((DoubleSetting) setting).getValue() : ((IntSetting) setting).getValue();
+    }
+
+    private void setValue(double value) {
+        if (isDouble) {
+            ((DoubleSetting) setting).setValue(value);
+        } else {
+            ((IntSetting) setting).setValue((int) Math.round(value));
+        }
+    }
+
     @Override
     public void render(RendererSet set, int mouseX, int mouseY, float partialTicks) {
-        if (!setting.isAvailable()) return;
+        if (setting instanceof IntSetting s && !s.isAvailable()) return;
+        if (setting instanceof DoubleSetting s && !s.isAvailable()) return;
 
         boolean hovered = ColorSettingComponent.isMouseOutOfPicker(mouseX, mouseY) && MouseUtils.isHovering(getX(), getY(), getWidth(), getHeight(), mouseX, mouseY);
         Color bg = hovered ? new Color(255, 255, 255, (int) (18 * alpha)) : new Color(255, 255, 255, (int) (10 * alpha));
@@ -60,13 +101,13 @@ public class DoubleSettingComponent extends Component {
         float textScale = 0.85f * scale;
         float textY = getY() + (getHeight() - set.font().getHeight(textScale)) / 2.0f - 0.5f * scale;
 
-        String name = setting.getDisplayName();
+        String name = isDouble ? ((DoubleSetting) setting).getDisplayName() : ((IntSetting) setting).getDisplayName();
         set.font().addText(name, getX() + padding, textY, textScale, new Color(255, 255, 255, (int) (255 * alpha)));
 
         String valueStr;
         String valueMeasureStr;
         if (editing) {
-            if (setting.isPercentageMode()) {
+            if (isPercentageMode()) {
                 valueMeasureStr = editText + "%";
                 valueStr = valueMeasureStr;
                 if (System.currentTimeMillis() % 1000 > 500) valueStr += "_";
@@ -75,29 +116,29 @@ public class DoubleSettingComponent extends Component {
                 valueStr = editText;
                 if (System.currentTimeMillis() % 1000 > 500) valueStr += "_";
             }
-        } else if (setting.isPercentageMode()) {
-            double min = setting.getMin();
-            double max = setting.getMax();
-            double v = setting.getValue();
+        } else if (isPercentageMode()) {
+            double min = getMin();
+            double max = getMax();
+            double v = getValue();
             int percent = 0;
             if (max != min) {
                 percent = (int) Math.round(((v - min) / (max - min)) * 100.0);
-                percent = Math.max(0, Math.min(100, percent));
+                percent = Mth.clamp(percent, 0, 100);
             }
             valueStr = percent + "%";
             valueMeasureStr = valueStr;
         } else {
-            valueStr = formatValue(setting.getValue());
+            valueStr = formatValue(getValue());
             valueMeasureStr = valueStr;
         }
 
         float valueInnerPad = 4.0f * scale;
-        String minStr = formatValue(setting.getMin());
-        String maxStr = formatValue(setting.getMax());
+        String minStr = formatValue(getMin());
+        String maxStr = formatValue(getMax());
         float valueMinW = set.font().getWidth(minStr, textScale);
         float valueMaxW = set.font().getWidth(maxStr, textScale);
         float valuePercentW = set.font().getWidth("100%", textScale);
-        float valueBoxW = Math.max(valueMinW, Math.max(valueMaxW, valuePercentW)) + valueInnerPad * 6.0f + 8.0f * scale; // 数值底下圆角矩形长
+        float valueBoxW = Math.max(valueMinW, Math.max(valueMaxW, valuePercentW)) + valueInnerPad * 6.0f + 8.0f * scale;
         float valueBoxH = Math.max(0.0f, getHeight() - 4.0f * scale);
         float valueBoxX = getX() + getWidth() - padding - valueBoxW;
         float valueBoxY = getY() + (getHeight() - valueBoxH) / 2.0f;
@@ -112,12 +153,12 @@ public class DoubleSettingComponent extends Component {
         Color valueBg = new Color(255, 255, 255, (int) (Mth.clamp(valueAlpha, 0, 255) * alpha));
         set.bottomRoundRect().addRoundRect(valueBoxX, valueBoxY, valueBoxW, valueBoxH, 6.0f * scale, valueBg);
 
-        float valueW = Math.min(set.font().getWidth(valueMeasureStr, textScale), Math.max(0.0f, valueBoxW - valueInnerPad * 2.0f));
+        float valueW = Mth.clamp(set.font().getWidth(valueMeasureStr, textScale), 0.0f, Math.max(0.0f, valueBoxW - valueInnerPad * 2.0f));
         float valueX = valueBoxX + (valueBoxW - valueW) / 2.0f;
         float valueTextY = valueBoxY + (valueBoxH - set.font().getHeight(textScale)) / 2.0f - 0.5f * scale;
         set.font().addText(valueStr, valueX, valueTextY, textScale, new Color(200, 200, 200, (int) (255 * alpha)));
 
-        float sliderWidth = 70.0f * scale; // 条长
+        float sliderWidth = 70.0f * scale;
         float sliderHeight = 3.0f * scale;
         float sliderX = valueBoxX - padding - sliderWidth;
         float sliderY = getY() + (getHeight() - sliderHeight) / 2.0f;
@@ -133,33 +174,30 @@ public class DoubleSettingComponent extends Component {
 
         if (!editing && dragging) {
             float mouseRelX = mouseX - sliderX;
-            float percent = Math.max(0.0f, Math.min(1.0f, mouseRelX / sliderWidth));
-            double range = setting.getMax() - setting.getMin();
-            double newVal = setting.getMin() + (range * percent);
+            float percent = Mth.clamp(mouseRelX / sliderWidth, 0.0f, 1.0f);
+            double range = getMax() - getMin();
+            double newVal = getMin() + (range * percent);
 
-            if (setting.getStep() > 0) {
-                double step = setting.getStep();
-                double stepped = newVal - setting.getMin();
-                stepped = Math.round(stepped / step) * step;
-                newVal = setting.getMin() + stepped;
+            double step = getStep();
+            if (step > 0) {
+                double stepped = Math.round((newVal - getMin()) / step) * step;
+                newVal = getMin() + stepped;
             }
-            setting.setValue(newVal);
+            setValue(newVal);
         }
 
         int track = (int) Mth.lerp(it, 60.0f, 82.0f);
         set.bottomRoundRect().addRoundRect(sliderX, sliderY, sliderWidth, sliderHeight, sliderHeight / 2.0f, new Color(track, track, track, (int) (255 * alpha)));
 
-        float targetPercent = getPercent(setting.getValue(), setting.getMin(), setting.getMax());
+        float targetPercent = (float) ((getValue() - getMin()) / (getMax() - getMin()));
         if (!editing && dragging) {
             sliderAnimation.setStartValue(targetPercent);
         } else {
             sliderAnimation.run(targetPercent);
         }
-        float animatedPercent = sliderAnimation.getValue();
-        animatedPercent = Mth.clamp(animatedPercent, 0.0f, 1.0f);
+        float animatedPercent = Mth.clamp(sliderAnimation.getValue(), 0.0f, 1.0f);
 
-        float filledW = sliderWidth * animatedPercent;
-        filledW = Mth.clamp(filledW, 0.0f, sliderWidth);
+        float filledW = Mth.clamp(sliderWidth * animatedPercent, 0.0f, sliderWidth);
 
         if (filledW > 0) {
             int fill = (int) Mth.lerp(it, 148.0f, 176.0f);
@@ -179,9 +217,31 @@ public class DoubleSettingComponent extends Component {
         set.bottomRoundRect().addRoundRect(knobX, knobY, knobSize, knobSize, knobSize / 2.0f, new Color(255, 255, 255, (int) (255 * alpha)));
     }
 
-    private static float getPercent(double value, double min, double max) {
+    private static float getPercentInt(int value, int min, int max) {
+        if (max == min) return 0.0f;
+        return (float) (value - min) / (float) (max - min);
+    }
+
+    private static float getPercentDouble(double value, double min, double max) {
         if (max == min) return 0.0f;
         return (float) ((value - min) / (max - min));
+    }
+
+    private int getDecimalPlaces() {
+        double step = getStep();
+        if (step <= 0.0) return isDouble ? 2 : 0;
+        BigDecimal bd = BigDecimal.valueOf(step).stripTrailingZeros();
+        return Mth.clamp(bd.scale(), 0, 8);
+    }
+
+    private String formatValue(double value) {
+        if (!isDouble) {
+            return String.valueOf((int) Math.round(value));
+        }
+        int decimals = getDecimalPlaces();
+        BigDecimal bd = BigDecimal.valueOf(value).setScale(decimals, RoundingMode.HALF_UP).stripTrailingZeros();
+        String s = bd.toPlainString();
+        return s.equals("-0") ? "0" : s;
     }
 
     @Override
@@ -199,17 +259,16 @@ public class DoubleSettingComponent extends Component {
                 dragging = true;
 
                 float mouseRelX = (float) event.x() - lastSliderX;
-                float percent = Math.max(0.0f, Math.min(1.0f, mouseRelX / lastSliderW));
-                double range = setting.getMax() - setting.getMin();
-                double newVal = setting.getMin() + (range * percent);
+                float percent = Mth.clamp(mouseRelX / lastSliderW, 0.0f, 1.0f);
+                double range = getMax() - getMin();
+                double newVal = getMin() + (range * percent);
 
-                if (setting.getStep() > 0) {
-                    double step = setting.getStep();
-                    double stepped = newVal - setting.getMin();
-                    stepped = Math.round(stepped / step) * step;
-                    newVal = setting.getMin() + stepped;
+                double step = getStep();
+                if (step > 0) {
+                    double stepped = Math.round((newVal - getMin()) / step) * step;
+                    newVal = getMin() + stepped;
                 }
-                setting.setValue(newVal);
+                setValue(newVal);
                 return true;
             }
         }
@@ -217,18 +276,18 @@ public class DoubleSettingComponent extends Component {
             if (MouseUtils.isHovering(lastValueBoxX, lastValueBoxY, lastValueBoxW, lastValueBoxH, event.x(), event.y())) {
                 dragging = false;
                 editing = true;
-                if (setting.isPercentageMode()) {
-                    double min = setting.getMin();
-                    double max = setting.getMax();
-                    double v = setting.getValue();
+                if (isPercentageMode()) {
+                    double min = getMin();
+                    double max = getMax();
+                    double v = getValue();
                     int percent = 0;
                     if (max != min) {
                         percent = (int) Math.round(((v - min) / (max - min)) * 100.0);
-                        percent = Math.max(0, Math.min(100, percent));
+                        percent = Mth.clamp(percent, 0, 100);
                     }
                     editText = String.valueOf(percent);
                 } else {
-                    editText = formatValue(setting.getValue());
+                    editText = formatValue(getValue());
                 }
                 return true;
             }
@@ -280,61 +339,44 @@ public class DoubleSettingComponent extends Component {
             editText = "-";
             return true;
         }
-        if (c == '.' && !editText.contains(".")) {
+        if (isDouble && c == '.' && !editText.contains(".")) {
             editText += ".";
             return true;
         }
-        if (c == '%' && setting.isPercentageMode()) {
+        if (c == '%' && isPercentageMode()) {
             return true;
         }
         return super.charTyped(input);
     }
 
-    private int getDecimalPlaces() {
-        double step = setting.getStep();
-        if (step <= 0.0) return 2;
-        BigDecimal bd = BigDecimal.valueOf(step).stripTrailingZeros();
-        return Math.min(8, Math.max(0, bd.scale()));
-    }
-
-    private String formatValue(double value) {
-        int decimals = getDecimalPlaces();
-        BigDecimal bd = BigDecimal.valueOf(value).setScale(decimals, RoundingMode.HALF_UP).stripTrailingZeros();
-        String s = bd.toPlainString();
-        return s.equals("-0") ? "0" : s;
-    }
-
     private void applyEditText() {
         String raw = editText == null ? "" : editText.trim();
-        if (raw.isEmpty() || raw.equals("-") || raw.equals(".")) return;
+        if (raw.isEmpty() || raw.equals("-") || (isDouble && raw.equals("."))) return;
         try {
-            if (setting.isPercentageMode()) {
+            if (isPercentageMode()) {
                 raw = raw.replace("%", "");
                 double p = Double.parseDouble(raw);
-                p = Math.max(0.0, Math.min(100.0, p));
-                double min = setting.getMin();
-                double max = setting.getMax();
+                p = Mth.clamp(p, 0.0, 100.0);
+                double min = getMin();
+                double max = getMax();
                 double newVal = min;
                 if (max != min) {
                     newVal = min + ((max - min) * (p / 100.0));
                 }
-                if (setting.getStep() > 0) {
-                    double step = setting.getStep();
-                    double stepped = newVal - min;
-                    stepped = Math.round(stepped / step) * step;
+                double step = getStep();
+                if (step > 0) {
+                    double stepped = Math.round((newVal - min) / step) * step;
                     newVal = min + stepped;
                 }
-                setting.setValue(newVal);
+                setValue(newVal);
             } else {
                 double newVal = Double.parseDouble(raw);
-                if (setting.getStep() > 0) {
-                    double step = setting.getStep();
-                    double min = setting.getMin();
-                    double stepped = newVal - min;
-                    stepped = Math.round(stepped / step) * step;
-                    newVal = min + stepped;
+                double step = getStep();
+                if (step > 0) {
+                    double stepped = Math.round((newVal - getMin()) / step) * step;
+                    newVal = getMin() + stepped;
                 }
-                setting.setValue(newVal);
+                setValue(newVal);
             }
         } catch (NumberFormatException ignored) {
         }

@@ -9,6 +9,7 @@
     "MixinEntityRenderer",
     "MixinGlDebug",
     "MixinGui",
+    "MixinLightTexture",
     "MixinLivingEntity",
     "MixinLivingEntityRenderer",
     "MixinLocalPlayer",
