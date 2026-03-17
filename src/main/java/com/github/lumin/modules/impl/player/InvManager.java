@@ -9,7 +9,7 @@ import com.github.lumin.settings.impl.DoubleSetting;
 import com.github.lumin.settings.impl.EnumSetting;
 import com.github.lumin.settings.impl.IntSetting;
 import com.github.lumin.utils.math.MathUtils;
-import com.github.lumin.utils.math.TimerUtils;
+import com.github.lumin.utils.timer.TimerUtils;
 import com.github.lumin.utils.player.ChatUtils;
 import com.github.lumin.utils.player.InvHelper;
 import com.github.lumin.utils.player.MoveUtils;

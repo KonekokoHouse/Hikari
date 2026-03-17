@@ -5,7 +5,7 @@ import com.github.lumin.modules.Module;
 import com.github.lumin.settings.impl.BoolSetting;
 import com.github.lumin.settings.impl.IntSetting;
 import com.github.lumin.utils.math.MathUtils;
-import com.github.lumin.utils.math.TimerUtils;
+import com.github.lumin.utils.timer.TimerUtils;
 import com.github.lumin.utils.player.InvHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
