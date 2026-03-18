@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ConfigManager {
 
@@ -29,10 +28,10 @@ public class ConfigManager {
 
     private static final Path configFile = Paths.get("lumin-config").resolve("config.json");
 
+    private boolean dirty;
     private boolean modulesApplied;
 
     private JsonObject root = new JsonObject();
-    private final AtomicBoolean dirty = new AtomicBoolean(false);
 
     private ConfigManager() {
     }
@@ -42,7 +41,7 @@ public class ConfigManager {
             loadFromDisk();
             if (!root.has("version")) {
                 root.addProperty("version", CONFIG_VERSION);
-                dirty.set(true);
+                dirty = true;
             }
             applyToModules(ModuleManager.INSTANCE.getModules());
         } catch (Exception e) {
@@ -152,12 +151,12 @@ public class ConfigManager {
         JsonElement old = root.get("modules");
         if (old == null || !old.equals(newModulesObj)) {
             root.add("modules", newModulesObj);
-            dirty.set(true);
+            dirty = true;
         }
 
         if (!root.has("version")) {
             root.addProperty("version", CONFIG_VERSION);
-            dirty.set(true);
+            dirty = true;
         }
     }
 
@@ -201,7 +200,7 @@ public class ConfigManager {
     }
 
     private void writeToDiskIfDirty() {
-        if (!dirty.compareAndSet(true, false)) {
+        if (!dirty) {
             return;
         }
 
@@ -216,9 +215,9 @@ public class ConfigManager {
                     StandardOpenOption.TRUNCATE_EXISTING,
                     StandardOpenOption.WRITE
             );
+            dirty = false;
         } catch (IOException e) {
             Lumin.LOGGER.error("写入配置文件失败: {}", configFile, e);
-            dirty.set(true);
         }
     }
 

@@ -10,7 +10,6 @@ import com.github.lumin.settings.impl.EnumSetting;
 import com.github.lumin.settings.impl.IntSetting;
 import com.github.lumin.utils.player.MoveUtils;
 import com.github.lumin.utils.render.Render3DUtils;
-import com.google.common.eventbus.Subscribe;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientboundDisconnectPacket;
@@ -31,7 +30,6 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -222,7 +220,7 @@ public class Velocity extends Module {
 
     @SubscribeEvent
     public void onMoveInput(MovementInputUpdateEvent event) {
-        if (Objects.requireNonNull(mode.getValue()) == Mode.NoXZ) {
+        if (mode.is(Mode.NoXZ)) {
             if (stage == VelocityStage.DELAY && velocity != null && mc.hitResult instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() instanceof Player player && !AntiBot.INSTANCE.isBot(player)) {
                 event.getInput().moveVector = new Vec2(1, 0);
                 stage = VelocityStage.ATTACK;
@@ -237,7 +235,7 @@ public class Velocity extends Module {
         }
     }
 
-    @Subscribe
+    @SubscribeEvent
     public void onRender(RenderLevelStageEvent.AfterEntities event) {
         if (stage == VelocityStage.NONE) return;
         for (Entity entity : targets.keySet()) {

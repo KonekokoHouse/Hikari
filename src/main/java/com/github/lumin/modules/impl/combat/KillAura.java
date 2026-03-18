@@ -1,29 +1,14 @@
 package com.github.lumin.modules.impl.combat;
 
-import com.github.lumin.assets.resources.ResourceLocationUtils;
 import com.github.lumin.managers.RotationManager;
 import com.github.lumin.modules.Category;
 import com.github.lumin.modules.Module;
 import com.github.lumin.settings.impl.*;
 import com.github.lumin.utils.math.MathUtils;
-import com.github.lumin.utils.render.ColorUtils;
+import com.github.lumin.utils.render.TargetESPUtils;
 import com.github.lumin.utils.rotation.MovementFix;
 import com.github.lumin.utils.rotation.Priority;
 import com.github.lumin.utils.rotation.RotationUtils;
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.DepthTestFunction;
-import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Axis;
-import net.minecraft.client.Camera;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.rendertype.LayeringTransform;
-import net.minecraft.client.renderer.rendertype.OutputTarget;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.Mth;
-import net.minecraft.util.Util;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -32,18 +17,15 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Function;
 
 public class KillAura extends Module {
 
@@ -89,28 +71,6 @@ public class KillAura extends Module {
 
     private int switchIndex = 0;
     private float attacks = 0;
-
-    private float rotation = 0f;
-
-    private static final Identifier TARGET_TEX = ResourceLocationUtils.getIdentifier("textures/particles/target.png");
-
-    private final RenderPipeline TARGET_ICON_PIPELINE = RenderPipeline.builder(RenderPipelines.GUI_TEXTURED_SNIPPET)
-            .withLocation("pipeline/sakura_target_icon")
-            .withBlend(BlendFunction.TRANSLUCENT)
-            .withCull(false)
-            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-            .withDepthWrite(false)
-            .build();
-
-    private final Function<Identifier, RenderType> TARGET_ICON_LAYER = Util.memoize(texture -> RenderType.create(
-            "sakura_target_icon",
-            RenderSetup.builder(TARGET_ICON_PIPELINE)
-                    .withTexture("Sampler0", texture)
-                    .sortOnUpload()
-                    .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
-                    .setOutputTarget(OutputTarget.MAIN_TARGET)
-                    .createRenderSetup()
-    ));
 
     @Override
     protected void onDisable() {
@@ -179,10 +139,9 @@ public class KillAura extends Module {
     private void onRender3D(RenderLevelStageEvent.AfterEntities event) {
         if (nullCheck() || !esp.getValue() || target == null) return;
 
-        float deltaTick = mc.getDeltaTracker().getGameTimeDeltaPartialTick(true);
-
         switch (espMode.getValue()) {
-            case CaptureMark -> renderEsp(target, event.getPoseStack(), deltaTick);
+            case CaptureMark ->
+                    TargetESPUtils.drawCaptureMark(event.getPoseStack(), target, espSize.getValue(), espRotSpeed.getValue(), waveSpeed.getValue(), espColor1.getValue(), espColor2.getValue());
         }
 
     }
@@ -221,55 +180,6 @@ public class KillAura extends Module {
         } else {
             return false;
         }
-    }
-
-    private void renderEsp(LivingEntity target, PoseStack poseStack, float tickDelta) {
-        rotation -= espRotSpeed.getValue().floatValue();
-        if (rotation <= -360f) rotation += 360f;
-
-        Vec3 cam = mc.getEntityRenderDispatcher().camera.position();
-
-        double ex = Mth.lerp(tickDelta, target.xOld, target.getX()) - cam.x;
-        double ey = Mth.lerp(tickDelta, target.yOld, target.getY()) - cam.y;
-        double ez = Mth.lerp(tickDelta, target.zOld, target.getZ()) - cam.z;
-
-        float entityHeight = target.getBbHeight();
-        float size = espSize.getValue().floatValue() * 0.5f;
-
-        poseStack.pushPose();
-        poseStack.translate(ex, ey + entityHeight * 0.5, ez);
-
-        Camera camera = mc.gameRenderer.getMainCamera();
-        poseStack.mulPose(Axis.YP.rotationDegrees(-camera.yRot()));
-        poseStack.mulPose(Axis.XP.rotationDegrees(camera.xRot()));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(rotation));
-
-        drawTextureQuad(poseStack, size);
-
-        poseStack.popPose();
-    }
-
-    private void drawTextureQuad(PoseStack matrices, float size) {
-        Matrix4f matrix = matrices.last().pose();
-        BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-
-        Color c1 = getColorForProgress(0);
-        Color c2 = getColorForProgress(0.25f);
-        Color c3 = getColorForProgress(0.5f);
-        Color c4 = getColorForProgress(0.75f);
-
-        buffer.addVertex(matrix, -size, -size, 0).setUv(0, 0).setColor(c1.getRGB());
-        buffer.addVertex(matrix, -size, size, 0).setUv(0, 1).setColor(c2.getRGB());
-        buffer.addVertex(matrix, size, size, 0).setUv(1, 1).setColor(c3.getRGB());
-        buffer.addVertex(matrix, size, -size, 0).setUv(1, 0).setColor(c4.getRGB());
-
-        TARGET_ICON_LAYER.apply(TARGET_TEX).draw(buffer.buildOrThrow());
-    }
-
-    private Color getColorForProgress(float progress) {
-        float wave = (float) Math.sin((progress * Math.PI * 2) + (System.currentTimeMillis() / 1000f * waveSpeed.getValue()));
-        wave = (wave + 1f) / 2f;
-        return ColorUtils.interpolateColor(espColor1.getValue(), espColor2.getValue(), wave);
     }
 
 }
