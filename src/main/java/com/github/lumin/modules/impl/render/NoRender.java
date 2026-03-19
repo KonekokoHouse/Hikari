@@ -10,7 +10,7 @@ public class NoRender extends Module {
 
     public final BoolSetting potionEffects = boolSetting("PotionEffects", true);
     public final BoolSetting playerNameTags = boolSetting("PlayerNameTags", true);
-    public final BoolSetting explosions = boolSetting("Explosions", false);
+    public final BoolSetting explosions = boolSetting("Explosions", true);
     public final BoolSetting totems = boolSetting("Totems", false);
 
     private NoRender() {

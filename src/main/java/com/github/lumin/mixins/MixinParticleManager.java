@@ -15,6 +15,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ParticleEngine.class)
 public class MixinParticleManager {
 
+    @Inject(method = "createParticle", at = @At("HEAD"), cancellable = true, require = 0)
+    private void lumin$cancelExplosionParticleCreation(ParticleOptions particleOptions, double x, double y, double z, double velocityX, double velocityY, double velocityZ, CallbackInfoReturnable<Particle> cir) {
+        if (!shouldCancel(particleOptions)) {
+            return;
+        }
+        cir.setReturnValue(null);
+        cir.cancel();
+    }
+
     @Inject(method = "addParticle", at = @At("HEAD"), cancellable = true, require = 0)
     private void lumin$cancelExplosionParticles(ParticleOptions particleOptions, double x, double y, double z, double velocityX, double velocityY, double velocityZ, CallbackInfoReturnable<Particle> cir) {
         if (!shouldCancel(particleOptions)) {
