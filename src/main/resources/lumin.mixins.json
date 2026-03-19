@@ -10,7 +10,6 @@
     "MixinConnection",
     "MixinEndCrystal",
     "MixinEndCrystalRenderer",
-    "MixinExplosion",
     "MixinEntity",
     "MixinEntityRenderer",
     "MixinGlDebug",
