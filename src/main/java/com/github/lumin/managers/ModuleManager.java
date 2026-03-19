@@ -43,6 +43,7 @@ public class ModuleManager {
                 Disabler.INSTANCE,
                 InvManager.INSTANCE,
                 JumpCooldown.INSTANCE,
+                MoveFix.INSTANCE,
                 NoSlow.INSTANCE,
                 SafeWalk.INSTANCE,
                 Scaffold.INSTANCE,
