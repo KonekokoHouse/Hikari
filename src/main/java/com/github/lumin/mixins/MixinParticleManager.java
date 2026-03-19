@@ -24,6 +24,21 @@ public class MixinParticleManager {
         cir.cancel();
     }
 
+    @Inject(method = "addParticle", at = @At("RETURN"), cancellable = true, require = 0)
+    private void lumin$cancelExplosionParticleInstances(ParticleOptions particleOptions, double x, double y, double z, double velocityX, double velocityY, double velocityZ, CallbackInfoReturnable<Particle> cir) {
+        if (!NoRender.INSTANCE.isEnabled() || !NoRender.INSTANCE.explosions.getValue()) {
+            return;
+        }
+        Particle particle = cir.getReturnValue();
+        if (particle == null) {
+            return;
+        }
+        String name = particle.getClass().getSimpleName();
+        if (name.contains("Explosion") || name.contains("Smoke") || name.contains("Cloud") || name.contains("Poof")) {
+            cir.setReturnValue(null);
+        }
+    }
+
     @Inject(method = "addEmitter", at = @At("HEAD"), cancellable = true, require = 0)
     private void lumin$cancelExplosionEmitter(Entity entity, ParticleOptions particleOptions, int maxAge, CallbackInfo ci) {
         if (!shouldCancel(particleOptions)) {
