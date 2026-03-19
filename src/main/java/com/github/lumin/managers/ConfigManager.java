@@ -26,7 +26,7 @@ public class ConfigManager {
             .disableHtmlEscaping()
             .create();
 
-    private static final Path configFile = Paths.get("lumin-config").resolve("config.json");
+    private static final Path configFile = Paths.get("hikari-config").resolve("config.json");
 
     private boolean dirty;
     private boolean modulesApplied;
