@@ -131,7 +131,8 @@ public class FakePlayer extends Module {
         if (!damage.getValue() || fakePlayer == null || nullCheck()) return;
 
         Packet<?> packet = event.getPacket();
-        if (packet == null || !"ClientboundExplodePacket".equals(packet.getClass().getSimpleName())) return;
+        if (packet == null) return;
+        if (!"ClientboundExplodePacket".equals(packet.getClass().getSimpleName())) return;
 
         Vec3 explosionPos = readExplosionPos(packet);
         if (explosionPos == null) return;
