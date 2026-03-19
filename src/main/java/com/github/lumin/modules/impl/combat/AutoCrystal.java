@@ -274,18 +274,6 @@ public class AutoCrystal extends Module {
         cancelFuture();
     }
 
-    @Override
-    public String getInfo() {
-        if (currentTarget != null) {
-            String name = currentTarget.getName().getString();
-            if (renderDamageText.getValue()) {
-                return name + " " + String.format("%.1f", renderDamage) + " " + recentSpawns.size();
-            }
-            return name + " " + recentSpawns.size();
-        }
-        return super.getInfo();
-    }
-
     @SubscribeEvent
     public void onTick(ClientTickEvent.Pre event) {
         if (nullCheck()) return;
