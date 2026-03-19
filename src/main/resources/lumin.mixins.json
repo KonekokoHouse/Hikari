@@ -20,7 +20,7 @@
     "MixinLivingEntityRenderer",
     "MixinLocalPlayer",
     "MixinMultiPlayerGameMode",
-    "MixinParticleEngine",
+    "MixinParticleManager",
     "MixinTitleScreen",
     "MixinWindow"
   ],

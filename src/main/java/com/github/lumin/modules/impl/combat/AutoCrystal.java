@@ -200,11 +200,12 @@ public class AutoCrystal extends Module {
         cleanupAttacks();
         if (shouldPause()) return;
 
-        renderPos = null;
-        renderDamage = 0;
-
         updateTarget();
-        if (currentTarget == null) return;
+        if (currentTarget == null) {
+            renderPos = null;
+            renderDamage = 0.0f;
+            return;
+        }
 
         List<BlockPos> positions = getPlacePositions();
         List<Entity> entities = new ArrayList<>();
@@ -215,12 +216,18 @@ public class AutoCrystal extends Module {
         // calculate place
         if (placeSetting.getValue()) {
             placeCrystal = calculatePlace(positions);
+        } else {
+            placeCrystal = null;
         }
 
         // calculate attack
         if (breakSetting.getValue()) {
             attackCrystal = calculateAttack(entities);
+        } else {
+            attackCrystal = null;
         }
+
+        updateRenderState();
 
         // if no attack target, check if there is crystal at place pos
         if (attackCrystal == null && placeCrystal != null) {
@@ -315,6 +322,16 @@ public class AutoCrystal extends Module {
             }
         }
         return best;
+    }
+
+    private void updateRenderState() {
+        if (placeCrystal != null) {
+            renderPos = placeCrystal.damageData();
+            renderDamage = (float) placeCrystal.damage();
+            return;
+        }
+        renderPos = null;
+        renderDamage = 0.0f;
     }
 
     private void placeExecute(BlockPos pos) {
