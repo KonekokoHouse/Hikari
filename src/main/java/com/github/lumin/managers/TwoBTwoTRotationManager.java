@@ -5,9 +5,11 @@ import com.github.lumin.events.MotionEvent;
 import com.github.lumin.events.PacketEvent;
 import com.github.lumin.events.RayTraceEvent;
 import com.github.lumin.events.StrafeEvent;
+import com.github.lumin.modules.impl.player.MoveFix;
 import com.github.lumin.utils.player.MoveUtils;
 import com.github.lumin.utils.rotation.MovementFix;
 import com.github.lumin.utils.rotation.Priority;
+import com.github.lumin.utils.rotation.RotationUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.util.Mth;
@@ -21,9 +23,9 @@ import org.joml.Vector2f;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class AltRotationManager {
+public class TwoBTwoTRotationManager {
 
-    public static final AltRotationManager INSTANCE = new AltRotationManager();
+    public static final TwoBTwoTRotationManager INSTANCE = new TwoBTwoTRotationManager();
 
     private final Minecraft mc = Minecraft.getInstance();
     private final List<RotationRequest> requests = new CopyOnWriteArrayList<>();
@@ -36,7 +38,9 @@ public class AltRotationManager {
     private float lastServerYaw;
     private float lastServerPitch;
 
-    private AltRotationManager() {
+    private int preserveTicks;
+
+    private TwoBTwoTRotationManager() {
         NeoForge.EVENT_BUS.register(this);
     }
 
@@ -47,6 +51,12 @@ public class AltRotationManager {
         if (Float.isNaN(rotations.x) || Float.isNaN(rotations.y) || Float.isInfinite(rotations.x) || Float.isInfinite(rotations.y)) {
             return;
         }
+        if (MoveFix.INSTANCE.mouseSensFix.getValue()) {
+            double gcd = Math.pow(mc.options.sensitivity().get() * 0.6 + 0.2, 3.0) * 1.2;
+            rotations.x = (float) (rotations.x - (rotations.x - serverYaw) % gcd);
+            rotations.y = (float) (rotations.y - (rotations.y - serverPitch) % gcd);
+        }
+
         RotationRequest request = new RotationRequest(
                 priority != null ? priority.priority : Priority.Lowest.priority,
                 Mth.wrapDegrees(rotations.x),
@@ -109,8 +119,9 @@ public class AltRotationManager {
         if (request == null) {
             if (rotation != null) {
                 rotateTicks++;
-                if (rotateTicks > 1) {
+                if (rotateTicks > MoveFix.INSTANCE.preserveTicks.getValue()) {
                     rotation = null;
+                    preserveTicks = 0;
                 }
             }
             return;
@@ -118,6 +129,7 @@ public class AltRotationManager {
         rotation = request;
         rotate = true;
         rotateTicks = 0;
+        preserveTicks = MoveFix.INSTANCE.preserveTicks.getValue();
     }
 
     @SubscribeEvent
@@ -161,7 +173,9 @@ public class AltRotationManager {
             rotate = false;
         }
         if (rotation.snap) {
-            rotation = null;
+            if (preserveTicks <= 0) {
+                rotation = null;
+            }
         }
     }
 

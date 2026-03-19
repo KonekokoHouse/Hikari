@@ -2,7 +2,7 @@ package com.github.lumin.modules.impl.combat;
 
 import com.github.lumin.events.PacketEvent;
 import com.github.lumin.managers.RotationManager;
-import com.github.lumin.managers.AltRotationManager;
+import com.github.lumin.managers.TwoBTwoTRotationManager;
 import com.github.lumin.modules.Category;
 import com.github.lumin.modules.Module;
 import com.github.lumin.modules.impl.player.MoveFix;
@@ -59,7 +59,7 @@ public class AutoCrystal extends Module {
 
     // =================== ENUMS ===================
     private enum PlaceMode { Visible, Wall, Base }
-    private enum RotationEngine { Lumin, Alt }
+    private enum RotationEngine { Lumin, TwoBTwoT }
 
     // =================== SETTINGS ===================
     // Core
@@ -553,8 +553,8 @@ public class AutoCrystal extends Module {
     private void rotateTo(Vec3 pos) {
         Vector2f rotations = RotationUtils.calculate(pos);
         MovementFix fix = movementSync.getValue() ? MovementFix.ON : MovementFix.OFF;
-        if (rotationEngine.getValue() == RotationEngine.Alt) {
-            AltRotationManager.INSTANCE.setRotations(rotations, rotateSpeed.getValue(), fix, Priority.High);
+        if (rotationEngine.getValue() == RotationEngine.TwoBTwoT) {
+            TwoBTwoTRotationManager.INSTANCE.setRotations(rotations, rotateSpeed.getValue(), fix, Priority.High);
         } else {
             RotationManager.INSTANCE.setRotations(rotations, rotateSpeed.getValue(), fix, Priority.High);
         }
