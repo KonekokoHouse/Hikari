@@ -1,5 +1,6 @@
 package com.github.lumin.mixins;
 
+import com.github.lumin.events.FallFlyingEvent;
 import com.github.lumin.events.JumpEvent;
 import com.github.lumin.managers.RotationManager;
 import com.github.lumin.modules.impl.player.JumpCooldown;
@@ -38,7 +39,18 @@ public abstract class MixinLivingEntity {
         }
         return entity.getYRot();
     }
-
+    @Redirect(
+            method = {"updateFallFlyingMovement"},
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;getXRot()F"
+            )
+    )
+    private float d(LivingEntity instance) {
+        FallFlyingEvent event = new FallFlyingEvent(instance.getXRot());
+        NeoForge.EVENT_BUS.post(event);
+        return event.getPitch();
+    }
     @Redirect(method = "aiStep", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;noJumpDelay:I", opcode = Opcodes.PUTFIELD, ordinal = 1))
     private void redirectJumpingCooldown(LivingEntity instance, int value) {
         JumpCooldown module = JumpCooldown.INSTANCE;

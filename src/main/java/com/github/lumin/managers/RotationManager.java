@@ -1,9 +1,6 @@
 package com.github.lumin.managers;
 
-import com.github.lumin.events.JumpEvent;
-import com.github.lumin.events.MotionEvent;
-import com.github.lumin.events.RayTraceEvent;
-import com.github.lumin.events.StrafeEvent;
+import com.github.lumin.events.*;
 import com.github.lumin.utils.player.MoveUtils;
 import com.github.lumin.utils.rotation.MovementFix;
 import com.github.lumin.utils.rotation.Priority;
@@ -232,6 +229,13 @@ public class RotationManager {
     private void onJump(JumpEvent event) {
         if (active && correctMovement == MovementFix.ON && rotations != null) {
             event.setYaw(rotations.x);
+        }
+    }
+   // @EventTarget
+    @SubscribeEvent
+    public void onFallFlying(FallFlyingEvent e) {
+        if (rotations != null) {
+            e.setPitch(rotations.y);
         }
     }
 
