@@ -38,6 +38,10 @@ public class ModuleDetailPanel {
     private final ShadowRenderer shadowRenderer;
     private final TextRenderer textRenderer;
     private final DropdownPopupHost popupHost;
+    private final RoundRectRenderer contentRoundRectRenderer = new RoundRectRenderer();
+    private final RectRenderer contentRectRenderer = new RectRenderer();
+    private final ShadowRenderer contentShadowRenderer = new ShadowRenderer();
+    private final TextRenderer contentTextRenderer = new TextRenderer();
     private DropdownLayout.Rect bounds;
     private int guiHeight;
     private DropdownLayout.Rect headerBounds;
@@ -86,7 +90,7 @@ public class ModuleDetailPanel {
         float contentHeight = settings.size() * (28.0f + DropdownTheme.ROW_GAP);
         state.setMaxDetailScroll(contentHeight - viewport.height());
 
-        DropdownScissor.apply(viewport, rectRenderer, roundRectRenderer, shadowRenderer, textRenderer, guiHeight);
+        DropdownScissor.apply(viewport, contentRectRenderer, contentRoundRectRenderer, contentShadowRenderer, contentTextRenderer, guiHeight);
         float y = viewport.y() - state.getDetailScroll();
         for (Setting<?> setting : settings) {
             SettingRow<?> row = rowCache.computeIfAbsent(setting, SettingViewFactory::create);
@@ -97,10 +101,14 @@ public class ModuleDetailPanel {
             settingEntries.add(new SettingEntry(row, rowBounds));
             Animation hoverAnimation = hoverAnimations.computeIfAbsent(setting, ignored -> new Animation(Easing.EASE_OUT_CUBIC, 120L));
             hoverAnimation.run(rowBounds.contains(effectiveMouseX, effectiveMouseY) ? 1.0f : 0.0f);
-            row.render(guiGraphics, roundRectRenderer, rectRenderer, textRenderer, rowBounds, hoverAnimation.getValue(), effectiveMouseX, effectiveMouseY, partialTick);
+            row.render(guiGraphics, contentRoundRectRenderer, contentRectRenderer, contentTextRenderer, rowBounds, hoverAnimation.getValue(), effectiveMouseX, effectiveMouseY, partialTick);
             y += row.getHeight() + DropdownTheme.ROW_GAP;
         }
-        DropdownScissor.clear(rectRenderer, roundRectRenderer, shadowRenderer, textRenderer);
+        contentShadowRenderer.drawAndClear();
+        contentRoundRectRenderer.drawAndClear();
+        contentRectRenderer.drawAndClear();
+        contentTextRenderer.drawAndClear();
+        DropdownScissor.clear(contentRectRenderer, contentRoundRectRenderer, contentShadowRenderer, contentTextRenderer);
     }
 
     public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {

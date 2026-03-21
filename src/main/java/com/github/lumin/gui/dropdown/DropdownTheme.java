@@ -42,21 +42,21 @@ public final class DropdownTheme {
     public static final Color SUCCESS = new Color(204, 194, 220);
     public static final Color ERROR = new Color(242, 184, 181);
 
-    public static final int PANEL_RADIUS = 16;
-    public static final int SECTION_RADIUS = 12;
-    public static final int CARD_RADIUS = 9;
+    public static final int PANEL_RADIUS = 18;
+    public static final int SECTION_RADIUS = 14;
+    public static final int CARD_RADIUS = 10;
     public static final int CHIP_RADIUS = 999;
 
-    public static final float OUTER_PADDING = 9.0f;
-    public static final float SECTION_GAP = 7.0f;
-    public static final float INNER_PADDING = 8.0f;
-    public static final float ROW_GAP = 4.0f;
-    public static final float PANEL_TITLE_INSET = 10.0f;
-    public static final float PANEL_VIEWPORT_INSET = 7.0f;
-    public static final float ROW_CONTENT_INSET = 8.0f;
-    public static final float ROW_TRAILING_INSET = 8.0f;
-    public static final float RAIL_COLLAPSED_WIDTH = 52.0f;
-    public static final float RAIL_EXPANDED_WIDTH = 182.0f;
+    public static final float OUTER_PADDING = 6.0f;
+    public static final float SECTION_GAP = 4.0f;
+    public static final float INNER_PADDING = 6.0f;
+    public static final float ROW_GAP = 3.0f;
+    public static final float PANEL_TITLE_INSET = 7.0f;
+    public static final float PANEL_VIEWPORT_INSET = 4.0f;
+    public static final float ROW_CONTENT_INSET = 6.0f;
+    public static final float ROW_TRAILING_INSET = 6.0f;
+    public static final float RAIL_COLLAPSED_WIDTH = 44.0f;
+    public static final float RAIL_EXPANDED_WIDTH = 156.0f;
 
     private DropdownTheme() {
     }

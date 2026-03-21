@@ -29,6 +29,10 @@ public class ModuleListPanel {
     private final RectRenderer rectRenderer;
     private final ShadowRenderer shadowRenderer;
     private final TextRenderer textRenderer;
+    private final RoundRectRenderer contentRoundRectRenderer = new RoundRectRenderer();
+    private final RectRenderer contentRectRenderer = new RectRenderer();
+    private final ShadowRenderer contentShadowRenderer = new ShadowRenderer();
+    private final TextRenderer contentTextRenderer = new TextRenderer();
     private DropdownLayout.Rect bounds;
     private int guiHeight;
     private final List<ModuleRow> rows = new ArrayList<>();
@@ -56,7 +60,7 @@ public class ModuleListPanel {
         float contentHeight = modules.size() * (ModuleRow.HEIGHT + DropdownTheme.ROW_GAP);
         state.setMaxModuleScroll(contentHeight - viewport.height());
 
-        DropdownScissor.apply(viewport, rectRenderer, roundRectRenderer, shadowRenderer, textRenderer, guiHeight);
+        DropdownScissor.apply(viewport, contentRectRenderer, contentRoundRectRenderer, contentShadowRenderer, contentTextRenderer, guiHeight);
         float y = viewport.y() - state.getModuleScroll();
         for (Module module : modules) {
             ModuleRow row = new ModuleRow(ModuleViewModel.from(module), new DropdownLayout.Rect(viewport.x(), y, viewport.width(), ModuleRow.HEIGHT));
@@ -65,10 +69,14 @@ public class ModuleListPanel {
             Animation selectionAnimation = selectionAnimations.computeIfAbsent(module, ignored -> new Animation(Easing.EASE_OUT_CUBIC, 160L));
             hoverAnimation.run(row.getBounds().contains(mouseX, mouseY) ? 1.0f : 0.0f);
             selectionAnimation.run(state.getSelectedModule() == module ? 1.0f : 0.0f);
-            row.render(roundRectRenderer, rectRenderer, textRenderer, hoverAnimation.getValue(), selectionAnimation.getValue());
+            row.render(contentRoundRectRenderer, contentRectRenderer, contentTextRenderer, hoverAnimation.getValue(), selectionAnimation.getValue());
             y += ModuleRow.HEIGHT + DropdownTheme.ROW_GAP;
         }
-        DropdownScissor.clear(rectRenderer, roundRectRenderer, shadowRenderer, textRenderer);
+        contentShadowRenderer.drawAndClear();
+        contentRoundRectRenderer.drawAndClear();
+        contentRectRenderer.drawAndClear();
+        contentTextRenderer.drawAndClear();
+        DropdownScissor.clear(contentRectRenderer, contentRoundRectRenderer, contentShadowRenderer, contentTextRenderer);
     }
 
     public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {

@@ -10,8 +10,10 @@ public final class DropdownLayout {
     }
 
     public static Layout compute(int screenWidth, int screenHeight, float railWidth) {
-        float panelWidth = Math.min(704.0f, screenWidth - 80.0f);
-        float panelHeight = Math.min(404.0f, screenHeight - 84.0f);
+        float panelWidth = Math.min(screenWidth * 0.60f, 612.0f);
+        float panelHeight = Math.min(screenHeight * 0.60f, 344.0f);
+        panelWidth = Math.max(panelWidth, 560.0f);
+        panelHeight = Math.max(panelHeight, 320.0f);
 
         float x = (screenWidth - panelWidth) / 2.0f;
         float y = (screenHeight - panelHeight) / 2.0f;
@@ -21,7 +23,7 @@ public final class DropdownLayout {
         float railX = x + DropdownTheme.OUTER_PADDING;
         float modulesX = railX + railWidth + gap;
         float maxContentRight = x + panelWidth - DropdownTheme.OUTER_PADDING;
-        float moduleWidth = Math.min(204.0f, panelWidth * 0.31f);
+        float moduleWidth = Math.min(172.0f, panelWidth * 0.295f);
         float detailX = modulesX + moduleWidth + gap;
         float detailWidth = maxContentRight - detailX;
 
