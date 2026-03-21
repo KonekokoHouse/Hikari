@@ -16,14 +16,16 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.world.level.block.SugarCaneBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -50,10 +52,14 @@ public class AutoFarm extends Module {
     private final BoolSetting potatoes = boolSetting("Potatoes", true);
     private final BoolSetting beetroot = boolSetting("Beetroot", true);
     private final BoolSetting sugarCane = boolSetting("SugarCane", true);
+    private final BoolSetting trees = boolSetting("Trees", false);
+    private final BoolSetting setTreePos = boolSetting("SetTreePos", false, trees::getValue);
+    private final BoolSetting clearTreePos = boolSetting("ClearTreePos", false, trees::getValue);
 
     private final TimerUtils actionTimer = new TimerUtils();
     private final TimerUtils harvestTimer = new TimerUtils();
     private int actionsThisTick;
+    private BlockPos treePos;
 
     private AutoFarm() {
         super("AutoFarm", Category.WORLD);
@@ -76,6 +82,8 @@ public class AutoFarm extends Module {
         if (nullCheck() || mc.gameMode == null || mc.screen != null) {
             return;
         }
+
+        updateTreePos();
 
         if (!autoPlant.getValue() && !autoHarvest.getValue()) {
             return;
@@ -164,17 +172,16 @@ public class AutoFarm extends Module {
     }
 
     private FindItemResult findPlantingItem(BlockPos pos, BlockState state) {
-        // Current stage only supports main hand, offhand, and hotbar silent swap. Inventory planting can be added later.
         if (canPlantCropAt(pos, state)) {
-            return findPreferredHotbarItem(this::isCropPlantingItem);
+            return findPreferredItem(this::isCropPlantingItem);
         }
         if (canPlantSugarCaneAt(pos, state)) {
-            return findPreferredHotbarItem(stack -> stack.is(Items.SUGAR_CANE));
+            return findPreferredItem(stack -> stack.is(Items.SUGAR_CANE));
         }
         return new FindItemResult(-1, 0, 0);
     }
 
-    private FindItemResult findPreferredHotbarItem(java.util.function.Predicate<net.minecraft.world.item.ItemStack> predicate) {
+    private FindItemResult findPreferredItem(java.util.function.Predicate<net.minecraft.world.item.ItemStack> predicate) {
         if (predicate.test(mc.player.getMainHandItem())) {
             return new FindItemResult(mc.player.getInventory().getSelectedSlot(), mc.player.getMainHandItem().getCount(), mc.player.getMainHandItem().getMaxStackSize());
         }
@@ -184,6 +191,13 @@ public class AutoFarm extends Module {
         }
 
         for (int slot = 0; slot <= 8; slot++) {
+            var stack = mc.player.getInventory().getItem(slot);
+            if (predicate.test(stack)) {
+                return new FindItemResult(slot, stack.getCount(), stack.getMaxStackSize());
+            }
+        }
+
+        for (int slot = 9; slot < mc.player.getInventory().getContainerSize(); slot++) {
             var stack = mc.player.getInventory().getItem(slot);
             if (predicate.test(stack)) {
                 return new FindItemResult(slot, stack.getCount(), stack.getMaxStackSize());
@@ -202,6 +216,10 @@ public class AutoFarm extends Module {
                 || item == Items.CARROT && carrots.getValue()
                 || item == Items.POTATO && potatoes.getValue()
                 || item == Items.BEETROOT_SEEDS && beetroot.getValue();
+    }
+
+    private boolean isTreePlantingItem(net.minecraft.world.item.ItemStack stack) {
+        return trees.getValue() && stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof SaplingBlock;
     }
 
     private boolean canPlantCropAt(BlockPos pos, BlockState state) {
@@ -225,9 +243,21 @@ public class AutoFarm extends Module {
         return false;
     }
 
+    private boolean canPlantTreeAt(BlockPos pos, BlockState state) {
+        if (!trees.getValue() || !mc.level.getBlockState(pos.above()).isAir()) {
+            return false;
+        }
+
+        return state.is(BlockTags.DIRT) || state.is(Blocks.GRASS_BLOCK) || state.is(Blocks.FARMLAND);
+    }
+
     private boolean tryPlant(List<BlockPos> targets) {
         if (!autoPlant.getValue() || !actionTimer.passedMillise(50.0)) {
             return false;
+        }
+
+        if (tryTreePlant()) {
+            return true;
         }
 
         for (BlockPos pos : targets) {
@@ -253,14 +283,24 @@ public class AutoFarm extends Module {
             return false;
         }
 
-        FindItemResult bonemealItem = findPreferredHotbarItem(stack -> stack.is(Items.BONE_MEAL));
+        FindItemResult bonemealItem = findPreferredItem(stack -> stack.is(Items.BONE_MEAL));
         if (!bonemealItem.found()) {
             return false;
         }
 
+        if (tryTreeBonemeal(bonemealItem)) {
+            return true;
+        }
+
         for (BlockPos pos : targets) {
             BlockState state = mc.level.getBlockState(pos);
-            if (!(state.getBlock() instanceof CropBlock crop) || crop.getAge(state) >= crop.getMaxAge()) {
+            if (state.getBlock() instanceof CropBlock crop) {
+                if (crop.getAge(state) >= crop.getMaxAge()) {
+                    continue;
+                }
+            } else if (state.getBlock() instanceof SaplingBlock) {
+                continue;
+            } else {
                 continue;
             }
 
@@ -273,6 +313,47 @@ public class AutoFarm extends Module {
         }
 
         return false;
+    }
+
+    private boolean tryTreePlant() {
+        if (!trees.getValue() || treePos == null) {
+            return false;
+        }
+
+        BlockState state = mc.level.getBlockState(treePos);
+        if (!canPlantTreeAt(treePos, state)) {
+            return false;
+        }
+
+        FindItemResult plantingItem = findPreferredItem(this::isTreePlantingItem);
+        if (!plantingItem.found()) {
+            return false;
+        }
+
+        if (shouldWaitForRotation(getPlantTarget(treePos))) {
+            return true;
+        }
+
+        plantAt(treePos, plantingItem);
+        return true;
+    }
+
+    private boolean tryTreeBonemeal(FindItemResult bonemealItem) {
+        if (!trees.getValue() || treePos == null) {
+            return false;
+        }
+
+        BlockPos saplingPos = treePos.above();
+        if (!(mc.level.getBlockState(saplingPos).getBlock() instanceof SaplingBlock)) {
+            return false;
+        }
+
+        if (shouldWaitForRotation(getBonemealTarget(saplingPos))) {
+            return true;
+        }
+
+        applyBonemeal(saplingPos, bonemealItem);
+        return true;
     }
 
     private boolean tryHarvest(List<BlockPos> targets) {
@@ -311,10 +392,43 @@ public class AutoFarm extends Module {
         return Vec3.atCenterOf(pos);
     }
 
-    private void plantAt(BlockPos pos, FindItemResult result) {
-        boolean swapped = result.slot() != 40 && result.slot() != mc.player.getInventory().getSelectedSlot();
-        if (swapped && !InvUtils.swap(result.slot(), true)) {
+    private void updateTreePos() {
+        if (!trees.getValue()) {
+            treePos = null;
+            setTreePos.setValue(false);
+            clearTreePos.setValue(false);
             return;
+        }
+
+        if (clearTreePos.getValue()) {
+            treePos = null;
+            clearTreePos.setValue(false);
+        }
+
+        if (!setTreePos.getValue()) {
+            return;
+        }
+
+        setTreePos.setValue(false);
+        if (mc.hitResult instanceof BlockHitResult blockHitResult) {
+            treePos = blockHitResult.getBlockPos();
+        }
+    }
+
+    private void plantAt(BlockPos pos, FindItemResult result) {
+        boolean swapped = false;
+        boolean invSwapped = false;
+
+        if (result.slot() != 40 && result.slot() != mc.player.getInventory().getSelectedSlot()) {
+            if (result.slot() <= 8) {
+                swapped = InvUtils.swap(result.slot(), true);
+            } else {
+                invSwapped = InvUtils.invSwap(result.slot());
+            }
+
+            if (!swapped && !invSwapped) {
+                return;
+            }
         }
 
         InteractionHand hand = result.getHand();
@@ -327,13 +441,25 @@ public class AutoFarm extends Module {
 
         if (swapped) {
             InvUtils.swapBack();
+        } else if (invSwapped) {
+            InvUtils.invSwapBack();
         }
     }
 
     private void applyBonemeal(BlockPos pos, FindItemResult result) {
-        boolean swapped = result.slot() != 40 && result.slot() != mc.player.getInventory().getSelectedSlot();
-        if (swapped && !InvUtils.swap(result.slot(), true)) {
-            return;
+        boolean swapped = false;
+        boolean invSwapped = false;
+
+        if (result.slot() != 40 && result.slot() != mc.player.getInventory().getSelectedSlot()) {
+            if (result.slot() <= 8) {
+                swapped = InvUtils.swap(result.slot(), true);
+            } else {
+                invSwapped = InvUtils.invSwap(result.slot());
+            }
+
+            if (!swapped && !invSwapped) {
+                return;
+            }
         }
 
         InteractionHand hand = result.getHand();
@@ -346,6 +472,8 @@ public class AutoFarm extends Module {
 
         if (swapped) {
             InvUtils.swapBack();
+        } else if (invSwapped) {
+            InvUtils.invSwapBack();
         }
     }
 
