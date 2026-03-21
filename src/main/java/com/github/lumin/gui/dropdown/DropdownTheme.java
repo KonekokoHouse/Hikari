@@ -53,7 +53,7 @@ public final class DropdownTheme {
     public static final float PANEL_VIEWPORT_INSET = 7.0f;
     public static final float ROW_CONTENT_INSET = 8.0f;
     public static final float ROW_TRAILING_INSET = 8.0f;
-    public static final float RAIL_COLLAPSED_WIDTH = 58.0f;
+    public static final float RAIL_COLLAPSED_WIDTH = 52.0f;
     public static final float RAIL_EXPANDED_WIDTH = 182.0f;
 
     private DropdownTheme() {

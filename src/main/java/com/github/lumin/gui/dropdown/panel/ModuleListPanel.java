@@ -12,11 +12,15 @@ import com.github.lumin.gui.dropdown.adapter.ModuleViewModel;
 import com.github.lumin.gui.dropdown.component.ModuleRow;
 import com.github.lumin.gui.dropdown.util.DropdownScissor;
 import com.github.lumin.modules.Module;
+import com.github.lumin.utils.render.animation.Animation;
+import com.github.lumin.utils.render.animation.Easing;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.MouseButtonEvent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ModuleListPanel {
 
@@ -28,6 +32,8 @@ public class ModuleListPanel {
     private DropdownLayout.Rect bounds;
     private int guiHeight;
     private final List<ModuleRow> rows = new ArrayList<>();
+    private final Map<Module, Animation> hoverAnimations = new HashMap<>();
+    private final Map<Module, Animation> selectionAnimations = new HashMap<>();
 
     public ModuleListPanel(DropdownState state, RoundRectRenderer roundRectRenderer, RectRenderer rectRenderer, ShadowRenderer shadowRenderer, TextRenderer textRenderer) {
         this.state = state;
@@ -55,7 +61,11 @@ public class ModuleListPanel {
         for (Module module : modules) {
             ModuleRow row = new ModuleRow(ModuleViewModel.from(module), new DropdownLayout.Rect(viewport.x(), y, viewport.width(), ModuleRow.HEIGHT));
             rows.add(row);
-            row.render(roundRectRenderer, rectRenderer, textRenderer, row.getBounds().contains(mouseX, mouseY), state.getSelectedModule() == module);
+            Animation hoverAnimation = hoverAnimations.computeIfAbsent(module, ignored -> new Animation(Easing.EASE_OUT_CUBIC, 120L));
+            Animation selectionAnimation = selectionAnimations.computeIfAbsent(module, ignored -> new Animation(Easing.EASE_OUT_CUBIC, 160L));
+            hoverAnimation.run(row.getBounds().contains(mouseX, mouseY) ? 1.0f : 0.0f);
+            selectionAnimation.run(state.getSelectedModule() == module ? 1.0f : 0.0f);
+            row.render(roundRectRenderer, rectRenderer, textRenderer, hoverAnimation.getValue(), selectionAnimation.getValue());
             y += ModuleRow.HEIGHT + DropdownTheme.ROW_GAP;
         }
         DropdownScissor.clear(rectRenderer, roundRectRenderer, shadowRenderer, textRenderer);

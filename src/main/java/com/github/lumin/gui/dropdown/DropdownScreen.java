@@ -64,6 +64,7 @@ public class DropdownScreen extends Screen {
         roundRectRendererSupplier.get().drawAndClear();
         rectRendererSupplier.get().drawAndClear();
         textRendererSupplier.get().drawAndClear();
+        categoryRailPanel.flushClippedText();
     }
 
     private void drawBackgroundScrim() {

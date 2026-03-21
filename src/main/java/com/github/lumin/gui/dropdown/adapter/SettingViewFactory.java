@@ -31,4 +31,5 @@ public final class SettingViewFactory {
         }
         return null;
     }
+
 }

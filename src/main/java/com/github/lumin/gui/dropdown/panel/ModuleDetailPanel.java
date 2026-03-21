@@ -13,13 +13,17 @@ import com.github.lumin.gui.dropdown.component.SettingRow;
 import com.github.lumin.gui.dropdown.util.DropdownScissor;
 import com.github.lumin.modules.Module;
 import com.github.lumin.settings.Setting;
+import com.github.lumin.utils.render.animation.Animation;
+import com.github.lumin.utils.render.animation.Easing;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ModuleDetailPanel {
 
@@ -32,6 +36,7 @@ public class ModuleDetailPanel {
     private int guiHeight;
     private DropdownLayout.Rect headerBounds;
     private final List<SettingEntry> settingEntries = new ArrayList<>();
+    private final Map<Setting<?>, Animation> hoverAnimations = new HashMap<>();
 
     public ModuleDetailPanel(DropdownState state, RoundRectRenderer roundRectRenderer, RectRenderer rectRenderer, ShadowRenderer shadowRenderer, TextRenderer textRenderer) {
         this.state = state;
@@ -77,7 +82,9 @@ public class ModuleDetailPanel {
             }
             DropdownLayout.Rect rowBounds = new DropdownLayout.Rect(viewport.x(), y, viewport.width(), row.getHeight());
             settingEntries.add(new SettingEntry(row, rowBounds));
-            row.render(guiGraphics, roundRectRenderer, rectRenderer, textRenderer, rowBounds, rowBounds.contains(mouseX, mouseY), mouseX, mouseY, partialTick);
+            Animation hoverAnimation = hoverAnimations.computeIfAbsent(setting, ignored -> new Animation(Easing.EASE_OUT_CUBIC, 120L));
+            hoverAnimation.run(rowBounds.contains(mouseX, mouseY) ? 1.0f : 0.0f);
+            row.render(guiGraphics, roundRectRenderer, rectRenderer, textRenderer, rowBounds, hoverAnimation.getValue(), mouseX, mouseY, partialTick);
             y += row.getHeight() + DropdownTheme.ROW_GAP;
         }
         DropdownScissor.clear(rectRenderer, roundRectRenderer, shadowRenderer, textRenderer);

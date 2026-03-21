@@ -34,15 +34,13 @@ public class ModuleRow {
         return new DropdownLayout.Rect(bounds.right() - DropdownTheme.ROW_TRAILING_INSET - 24.0f, bounds.y() + 9.0f, 24.0f, 14.0f);
     }
 
-    public void render(RoundRectRenderer roundRectRenderer, RectRenderer rectRenderer, TextRenderer textRenderer, boolean hovered, boolean selected) {
-        Color background = selected ? DropdownTheme.PRIMARY_CONTAINER : hovered ? DropdownTheme.SURFACE_CONTAINER_HIGH : DropdownTheme.SURFACE_CONTAINER;
-        Color titleColor = selected ? DropdownTheme.ON_PRIMARY_CONTAINER : DropdownTheme.TEXT_PRIMARY;
-        Color subColor = selected ? DropdownTheme.withAlpha(DropdownTheme.ON_PRIMARY_CONTAINER, 180) : DropdownTheme.TEXT_SECONDARY;
+    public void render(RoundRectRenderer roundRectRenderer, RectRenderer rectRenderer, TextRenderer textRenderer, float hoverProgress, float selectedProgress) {
+        Color hoverBackground = DropdownTheme.lerp(DropdownTheme.SURFACE_CONTAINER, DropdownTheme.SURFACE_CONTAINER_HIGH, hoverProgress);
+        Color background = DropdownTheme.lerp(hoverBackground, DropdownTheme.PRIMARY_CONTAINER, selectedProgress);
+        Color titleColor = DropdownTheme.lerp(DropdownTheme.TEXT_PRIMARY, DropdownTheme.ON_PRIMARY_CONTAINER, selectedProgress);
+        Color subColor = DropdownTheme.lerp(DropdownTheme.TEXT_SECONDARY, DropdownTheme.withAlpha(DropdownTheme.ON_PRIMARY_CONTAINER, 180), selectedProgress);
 
         roundRectRenderer.addRoundRect(bounds.x(), bounds.y(), bounds.width(), bounds.height(), DropdownTheme.CARD_RADIUS, background);
-        if (selected) {
-            rectRenderer.addRect(bounds.x() + 7.0f, bounds.y() + 6.0f, 2.0f, bounds.height() - 12.0f, DropdownTheme.PRIMARY);
-        }
 
         textRenderer.addText(module.displayName(), bounds.x() + DropdownTheme.ROW_CONTENT_INSET + 4.0f, bounds.y() + 7.0f, 0.70f, titleColor, StaticFontLoader.DUCKSANS);
         textRenderer.addText(module.category().getName(), bounds.x() + DropdownTheme.ROW_CONTENT_INSET + 4.0f, bounds.y() + 18.0f, 0.60f, subColor);
