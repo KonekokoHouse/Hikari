@@ -33,6 +33,8 @@ public final class DropdownTheme {
     public static final Color ON_TERTIARY = new Color(73, 37, 50);
     public static final Color TERTIARY_CONTAINER = new Color(99, 59, 72, 236);
     public static final Color ON_TERTIARY_CONTAINER = new Color(255, 216, 228);
+    public static final Color INVERSE_SURFACE = new Color(230, 224, 233);
+    public static final Color INVERSE_ON_SURFACE = new Color(49, 48, 51);
 
     public static final Color TEXT_PRIMARY = new Color(230, 224, 233);
     public static final Color TEXT_SECONDARY = new Color(202, 196, 208);

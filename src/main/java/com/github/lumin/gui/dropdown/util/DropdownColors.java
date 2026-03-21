@@ -1,5 +1,7 @@
 package com.github.lumin.gui.dropdown.util;
 
+import net.minecraft.util.Mth;
+
 import java.awt.*;
 
 public final class DropdownColors {
@@ -12,7 +14,7 @@ public final class DropdownColors {
     }
 
     public static Color mix(Color start, Color end, float delta) {
-        float t = DropdownMath.clamp(delta, 0.0f, 1.0f);
+        float t = Mth.clamp(delta, 0.0f, 1.0f);
         int red = (int) (start.getRed() + (end.getRed() - start.getRed()) * t);
         int green = (int) (start.getGreen() + (end.getGreen() - start.getGreen()) * t);
         int blue = (int) (start.getBlue() + (end.getBlue() - start.getBlue()) * t);

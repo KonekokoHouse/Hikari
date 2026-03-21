@@ -28,11 +28,29 @@ public class DropdownPopupHost {
     }
 
     public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
-        return activePopup != null && activePopup.mouseClicked(event, isDoubleClick);
+        if (activePopup == null) {
+            return false;
+        }
+        if (!activePopup.getBounds().contains(event.x(), event.y())) {
+            close();
+            return true;
+        }
+        boolean handled = activePopup.mouseClicked(event, isDoubleClick);
+        if (handled && activePopup.shouldCloseAfterClick()) {
+            close();
+        }
+        return handled;
     }
 
     public boolean keyPressed(KeyEvent event) {
-        return activePopup != null && activePopup.keyPressed(event);
+        if (activePopup == null) {
+            return false;
+        }
+        if (event.key() == 256) {
+            close();
+            return true;
+        }
+        return activePopup.keyPressed(event);
     }
 
     public interface Popup {
@@ -41,6 +59,10 @@ public class DropdownPopupHost {
         void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick);
 
         boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick);
+
+        default boolean shouldCloseAfterClick() {
+            return false;
+        }
 
         default boolean keyPressed(KeyEvent event) {
             return false;

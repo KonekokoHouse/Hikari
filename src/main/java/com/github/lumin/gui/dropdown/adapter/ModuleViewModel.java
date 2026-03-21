@@ -5,7 +5,6 @@ import com.github.lumin.modules.Module;
 
 public record ModuleViewModel(Module module, String displayName, String description, boolean enabled, Category category,
                               String searchText) {
-
     public static ModuleViewModel from(Module module) {
         String displayName = module.getTranslatedName();
         String description = module.getDescription();

@@ -56,4 +56,5 @@ public class ModuleRow {
         float knobX = enabled ? rect.right() - knobSize - 3.0f : rect.x() + 3.0f;
         roundRectRenderer.addRoundRect(knobX, rect.y() + 3.0f, knobSize, knobSize, DropdownTheme.CHIP_RADIUS, knob);
     }
+
 }

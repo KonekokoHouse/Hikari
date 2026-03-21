@@ -10,6 +10,11 @@ import com.github.lumin.gui.dropdown.DropdownState;
 import com.github.lumin.gui.dropdown.DropdownTheme;
 import com.github.lumin.gui.dropdown.adapter.SettingViewFactory;
 import com.github.lumin.gui.dropdown.component.SettingRow;
+import com.github.lumin.gui.dropdown.component.setting.DoubleSettingRow;
+import com.github.lumin.gui.dropdown.component.setting.EnumSettingRow;
+import com.github.lumin.gui.dropdown.component.setting.IntSettingRow;
+import com.github.lumin.gui.dropdown.popup.DropdownPopupHost;
+import com.github.lumin.gui.dropdown.popup.EnumSelectPopup;
 import com.github.lumin.gui.dropdown.util.DropdownScissor;
 import com.github.lumin.modules.Module;
 import com.github.lumin.settings.Setting;
@@ -32,24 +37,31 @@ public class ModuleDetailPanel {
     private final RectRenderer rectRenderer;
     private final ShadowRenderer shadowRenderer;
     private final TextRenderer textRenderer;
+    private final DropdownPopupHost popupHost;
     private DropdownLayout.Rect bounds;
     private int guiHeight;
     private DropdownLayout.Rect headerBounds;
     private final List<SettingEntry> settingEntries = new ArrayList<>();
     private final Map<Setting<?>, Animation> hoverAnimations = new HashMap<>();
+    private final Map<Setting<?>, SettingRow<?>> rowCache = new HashMap<>();
+    private SettingEntry draggingSliderEntry;
 
-    public ModuleDetailPanel(DropdownState state, RoundRectRenderer roundRectRenderer, RectRenderer rectRenderer, ShadowRenderer shadowRenderer, TextRenderer textRenderer) {
+    public ModuleDetailPanel(DropdownState state, RoundRectRenderer roundRectRenderer, RectRenderer rectRenderer, ShadowRenderer shadowRenderer, TextRenderer textRenderer, DropdownPopupHost popupHost) {
         this.state = state;
         this.roundRectRenderer = roundRectRenderer;
         this.rectRenderer = rectRenderer;
         this.shadowRenderer = shadowRenderer;
         this.textRenderer = textRenderer;
+        this.popupHost = popupHost;
     }
 
     public void render(GuiGraphics guiGraphics, DropdownLayout.Rect bounds, int mouseX, int mouseY, float partialTick) {
         this.bounds = bounds;
         this.guiHeight = guiGraphics.guiHeight();
         settingEntries.clear();
+        boolean popupConsumesHover = popupHost.getActivePopup() != null && popupHost.getActivePopup().getBounds().contains(mouseX, mouseY);
+        int effectiveMouseX = popupConsumesHover ? Integer.MIN_VALUE : mouseX;
+        int effectiveMouseY = popupConsumesHover ? Integer.MIN_VALUE : mouseY;
 
         Module module = state.getSelectedModule();
         String detailTitle = module == null ? "No Module" : module.getTranslatedName();
@@ -70,21 +82,22 @@ public class ModuleDetailPanel {
 
         DropdownLayout.Rect viewport = getViewport();
         List<Setting<?>> settings = module.getSettings().stream().filter(Setting::isAvailable).toList();
+        rowCache.keySet().removeIf(setting -> !settings.contains(setting));
         float contentHeight = settings.size() * (28.0f + DropdownTheme.ROW_GAP);
         state.setMaxDetailScroll(contentHeight - viewport.height());
 
         DropdownScissor.apply(viewport, rectRenderer, roundRectRenderer, shadowRenderer, textRenderer, guiHeight);
         float y = viewport.y() - state.getDetailScroll();
         for (Setting<?> setting : settings) {
-            SettingRow<?> row = SettingViewFactory.create(setting);
+            SettingRow<?> row = rowCache.computeIfAbsent(setting, SettingViewFactory::create);
             if (row == null) {
                 continue;
             }
             DropdownLayout.Rect rowBounds = new DropdownLayout.Rect(viewport.x(), y, viewport.width(), row.getHeight());
             settingEntries.add(new SettingEntry(row, rowBounds));
             Animation hoverAnimation = hoverAnimations.computeIfAbsent(setting, ignored -> new Animation(Easing.EASE_OUT_CUBIC, 120L));
-            hoverAnimation.run(rowBounds.contains(mouseX, mouseY) ? 1.0f : 0.0f);
-            row.render(guiGraphics, roundRectRenderer, rectRenderer, textRenderer, rowBounds, hoverAnimation.getValue(), mouseX, mouseY, partialTick);
+            hoverAnimation.run(rowBounds.contains(effectiveMouseX, effectiveMouseY) ? 1.0f : 0.0f);
+            row.render(guiGraphics, roundRectRenderer, rectRenderer, textRenderer, rowBounds, hoverAnimation.getValue(), effectiveMouseX, effectiveMouseY, partialTick);
             y += row.getHeight() + DropdownTheme.ROW_GAP;
         }
         DropdownScissor.clear(rectRenderer, roundRectRenderer, shadowRenderer, textRenderer);
@@ -106,9 +119,43 @@ public class ModuleDetailPanel {
         }
 
         for (SettingEntry entry : settingEntries) {
+            if (entry.row instanceof IntSettingRow intRow && intRow.mouseClicked(entry.bounds, event, isDoubleClick)) {
+                draggingSliderEntry = entry;
+                intRow.updateFromMouse(entry.bounds, event.x());
+                return true;
+            }
+            if (entry.row instanceof DoubleSettingRow doubleRow && doubleRow.mouseClicked(entry.bounds, event, isDoubleClick)) {
+                draggingSliderEntry = entry;
+                doubleRow.updateFromMouse(entry.bounds, event.x());
+                return true;
+            }
+            if (entry.row instanceof EnumSettingRow enumRow && entry.row.mouseClicked(entry.bounds, event, isDoubleClick)) {
+                popupHost.open(createEnumPopup(enumRow, entry.bounds));
+                return true;
+            }
             if (entry.row.mouseClicked(entry.bounds, event, isDoubleClick)) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    public boolean mouseReleased(MouseButtonEvent event) {
+        draggingSliderEntry = null;
+        return false;
+    }
+
+    public boolean mouseDragged(MouseButtonEvent event, double mouseX, double mouseY) {
+        if (draggingSliderEntry == null || event.button() != 0) {
+            return false;
+        }
+        if (draggingSliderEntry.row instanceof IntSettingRow intRow) {
+            intRow.updateFromMouse(draggingSliderEntry.bounds, mouseX);
+            return true;
+        }
+        if (draggingSliderEntry.row instanceof DoubleSettingRow doubleRow) {
+            doubleRow.updateFromMouse(draggingSliderEntry.bounds, mouseX);
+            return true;
         }
         return false;
     }
@@ -146,5 +193,19 @@ public class ModuleDetailPanel {
     }
 
     private record SettingEntry(SettingRow<?> row, DropdownLayout.Rect bounds) {
+    }
+
+    private EnumSelectPopup createEnumPopup(EnumSettingRow enumRow, DropdownLayout.Rect rowBounds) {
+        DropdownLayout.Rect chipBounds = enumRow.getChipBounds(textRenderer, rowBounds);
+        int optionCount = enumRow.getSetting().getModes().length;
+        float popupHeight = optionCount * 24.0f + 12.0f;
+        float popupWidth = Math.max(108.0f, chipBounds.width() + 24.0f);
+        float popupX = Math.max(bounds.x() + DropdownTheme.PANEL_VIEWPORT_INSET, chipBounds.right() - popupWidth);
+        float popupY = chipBounds.bottom() + 4.0f;
+        float maxBottom = bounds.bottom() - DropdownTheme.PANEL_VIEWPORT_INSET;
+        if (popupY + popupHeight > maxBottom) {
+            popupY = chipBounds.y() - popupHeight - 4.0f;
+        }
+        return new EnumSelectPopup(new DropdownLayout.Rect(popupX, popupY, popupWidth, popupHeight), chipBounds, enumRow.getSetting());
     }
 }

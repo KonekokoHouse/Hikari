@@ -28,4 +28,19 @@ public class DropdownInputRouter {
         }
         return detailPanel.keyPressed(event);
     }
+
+    public boolean routeMouseReleased(MouseButtonEvent event, DropdownPopupHost popupHost, ModuleDetailPanel detailPanel) {
+        if (popupHost.getActivePopup() != null) {
+            return false;
+        }
+        return detailPanel.mouseReleased(event);
+    }
+
+    public boolean routeMouseDragged(MouseButtonEvent event, double mouseX, double mouseY, DropdownPopupHost popupHost, ModuleDetailPanel detailPanel) {
+        if (popupHost.getActivePopup() != null) {
+            return false;
+        }
+        return detailPanel.mouseDragged(event, mouseX, mouseY);
+    }
+
 }

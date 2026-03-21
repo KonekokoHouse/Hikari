@@ -33,7 +33,7 @@ public class DropdownScreen extends Screen {
     private final DropdownInputRouter inputRouter = new DropdownInputRouter();
     private final CategoryRailPanel categoryRailPanel = new CategoryRailPanel(state, rectRendererSupplier.get(), roundRectRendererSupplier.get(), textRendererSupplier.get());
     private final ModuleListPanel moduleListPanel = new ModuleListPanel(state, roundRectRendererSupplier.get(), rectRendererSupplier.get(), shadowRendererSupplier.get(), textRendererSupplier.get());
-    private final ModuleDetailPanel moduleDetailPanel = new ModuleDetailPanel(state, roundRectRendererSupplier.get(), rectRendererSupplier.get(), shadowRendererSupplier.get(), textRendererSupplier.get());
+    private final ModuleDetailPanel moduleDetailPanel = new ModuleDetailPanel(state, roundRectRendererSupplier.get(), rectRendererSupplier.get(), shadowRendererSupplier.get(), textRendererSupplier.get(), popupHost);
 
     public DropdownScreen() {
         super(Component.literal("DropdownGui"));
@@ -58,13 +58,13 @@ public class DropdownScreen extends Screen {
         categoryRailPanel.render(guiGraphics, layout.rail(), mouseX, mouseY, partialTick);
         moduleListPanel.render(guiGraphics, layout.modules(), mouseX, mouseY, partialTick);
         moduleDetailPanel.render(guiGraphics, layout.detail(), mouseX, mouseY, partialTick);
-        popupHost.render(guiGraphics, mouseX, mouseY, partialTick);
 
         shadowRendererSupplier.get().drawAndClear();
         roundRectRendererSupplier.get().drawAndClear();
         rectRendererSupplier.get().drawAndClear();
         textRendererSupplier.get().drawAndClear();
         categoryRailPanel.flushClippedText();
+        popupHost.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     private void drawBackgroundScrim() {
@@ -116,6 +116,22 @@ public class DropdownScreen extends Screen {
             return true;
         }
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    @Override
+    public boolean mouseReleased(MouseButtonEvent event) {
+        if (inputRouter.routeMouseReleased(event, popupHost, moduleDetailPanel)) {
+            return true;
+        }
+        return super.mouseReleased(event);
+    }
+
+    @Override
+    public boolean mouseDragged(MouseButtonEvent event, double mouseX, double mouseY) {
+        if (inputRouter.routeMouseDragged(event, mouseX, mouseY, popupHost, moduleDetailPanel)) {
+            return true;
+        }
+        return super.mouseDragged(event, mouseX, mouseY);
     }
 
     @Override
