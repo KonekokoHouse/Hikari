@@ -20,7 +20,7 @@ public final class DropdownLayout {
         Rect panel = new Rect(x, y, panelWidth, panelHeight);
         Rect rail = new Rect(x + DropdownTheme.OUTER_PADDING, y + DropdownTheme.OUTER_PADDING, railWidth, panelHeight - DropdownTheme.OUTER_PADDING * 2.0f);
         Rect modules = new Rect(rail.right() + gap, y + DropdownTheme.OUTER_PADDING, moduleWidth, panelHeight - DropdownTheme.OUTER_PADDING * 2.0f);
-        Rect detail = new Rect(modules.right() + gap, y + DropdownTheme.OUTER_PADDING, detailWidth - DropdownTheme.OUTER_PADDING, panelHeight - DropdownTheme.OUTER_PADDING * 2.0f);
+        Rect detail = new Rect(modules.right() + gap, y + DropdownTheme.OUTER_PADDING, detailWidth, panelHeight - DropdownTheme.OUTER_PADDING * 2.0f);
 
         return new Layout(panel, rail, modules, detail);
     }
