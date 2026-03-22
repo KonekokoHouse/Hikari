@@ -10,9 +10,11 @@ import com.github.lumin.gui.dropdown.DropdownState;
 import com.github.lumin.gui.dropdown.DropdownTheme;
 import com.github.lumin.gui.dropdown.adapter.SettingViewFactory;
 import com.github.lumin.gui.dropdown.component.SettingRow;
+import com.github.lumin.gui.dropdown.component.setting.ColorSettingRow;
 import com.github.lumin.gui.dropdown.component.setting.DoubleSettingRow;
 import com.github.lumin.gui.dropdown.component.setting.EnumSettingRow;
 import com.github.lumin.gui.dropdown.component.setting.IntSettingRow;
+import com.github.lumin.gui.dropdown.popup.ColorPickerPopup;
 import com.github.lumin.gui.dropdown.popup.DropdownPopupHost;
 import com.github.lumin.gui.dropdown.popup.EnumSelectPopup;
 import com.github.lumin.gui.dropdown.util.DropdownScissor;
@@ -99,7 +101,7 @@ public class ModuleDetailPanel {
         float metaScale = 0.56f;
         float titleHeight = textRenderer.getHeight(titleScale, StaticFontLoader.DUCKSANS);
         float metaHeight = textRenderer.getHeight(metaScale);
-        float headerTextX = headerBounds.x() + DropdownTheme.PANEL_TITLE_INSET;
+        float headerTextX = getHeaderContentInsetX();
         float titleY = headerBounds.y() + 8.0f;
         float categoryY = titleY + titleHeight + 3.0f;
         float descriptionY = categoryY + metaHeight + 2.5f;
@@ -185,6 +187,10 @@ public class ModuleDetailPanel {
             }
             if (entry.row instanceof EnumSettingRow enumRow && entry.row.mouseClicked(entry.bounds, event, isDoubleClick)) {
                 popupHost.open(createEnumPopup(enumRow, entry.bounds));
+                return true;
+            }
+            if (entry.row instanceof ColorSettingRow colorRow && entry.row.mouseClicked(entry.bounds, event, isDoubleClick)) {
+                popupHost.open(createColorPopup(colorRow, entry.bounds));
                 return true;
             }
             if (entry.row.mouseClicked(entry.bounds, event, isDoubleClick)) {
@@ -274,19 +280,60 @@ public class ModuleDetailPanel {
     }
 
     private DropdownLayout.Rect getBindModeBounds() {
-        return new DropdownLayout.Rect(getHeaderControlGroupX(), headerBounds.y() + 37.0f, 124.0f, 18.0f);
+        return new DropdownLayout.Rect(getHeaderControlGroupX(), getHeaderSecondRowY(), getHeaderControlGroupWidth(), getHeaderControlHeight());
     }
 
     private DropdownLayout.Rect getModuleToggleBounds() {
-        return new DropdownLayout.Rect(getHeaderControlGroupX(), headerBounds.y() + 10.0f, 36.0f, 18.0f);
+        return new DropdownLayout.Rect(getHeaderControlGroupX(), getHeaderFirstRowY(), 36.0f, getHeaderControlHeight());
     }
 
     private DropdownLayout.Rect getKeybindBounds() {
-        return new DropdownLayout.Rect(getHeaderControlGroupX() + 44.0f, headerBounds.y() + 10.0f, 80.0f, 18.0f);
+        return new DropdownLayout.Rect(getHeaderControlGroupX() + 44.0f, getHeaderFirstRowY(), 80.0f, getHeaderControlHeight());
     }
 
     private float getHeaderControlGroupX() {
-        return headerBounds.right() - DropdownTheme.ROW_TRAILING_INSET - 124.0f;
+        return headerBounds.right() - getHeaderContentInset() - getHeaderControlGroupWidth();
+    }
+
+    private float getHeaderControlGroupWidth() {
+        return 124.0f;
+    }
+
+    private float getHeaderContentInset() {
+        return DropdownTheme.PANEL_TITLE_INSET + 2.0f;
+    }
+
+    private float getHeaderContentInsetX() {
+        return headerBounds.x() + getHeaderContentInset();
+    }
+
+    private float getHeaderControlHeight() {
+        return 18.0f;
+    }
+
+    private float getHeaderControlRadius() {
+        return 9.0f;
+    }
+
+    private float getHeaderFirstRowY() {
+        return headerBounds.y() + 10.0f;
+    }
+
+    private float getHeaderSecondRowY() {
+        return getHeaderFirstRowY() + getHeaderControlHeight() + 9.0f;
+    }
+
+    private void drawHeaderControlSurface(DropdownLayout.Rect bounds, float hoverProgress, float focusProgress) {
+        Color base = DropdownTheme.isLightTheme() ? DropdownTheme.SURFACE_CONTAINER : DropdownTheme.SURFACE_CONTAINER_HIGH;
+        roundRectRenderer.addRoundRect(bounds.x(), bounds.y(), bounds.width(), bounds.height(), getHeaderControlRadius(), base);
+        if (hoverProgress > 0.01f) {
+            int hoverAlpha = DropdownTheme.isLightTheme() ? 8 : 12;
+            roundRectRenderer.addRoundRect(bounds.x(), bounds.y(), bounds.width(), bounds.height(), getHeaderControlRadius(), DropdownTheme.withAlpha(DropdownTheme.TEXT_PRIMARY, (int) (hoverAlpha * hoverProgress)));
+        }
+        if (focusProgress > 0.01f) {
+            int focusAlpha = DropdownTheme.isLightTheme() ? 12 : 10;
+            roundRectRenderer.addRoundRect(bounds.x(), bounds.y(), bounds.width(), bounds.height(), getHeaderControlRadius(), DropdownTheme.withAlpha(DropdownTheme.PRIMARY, (int) (focusAlpha * focusProgress)));
+        }
     }
 
     private void drawModuleToggleControl(Module module, int mouseX, int mouseY) {
@@ -298,13 +345,13 @@ public class ModuleDetailPanel {
         float progress = moduleToggleAnimation.getValue();
         float hoverProgress = moduleToggleHoverAnimation.getValue();
         float handleSize = moduleToggleHandleSizeAnimation.getValue();
-        Color track = DropdownTheme.lerp(DropdownTheme.SURFACE_CONTAINER_HIGHEST, DropdownTheme.PRIMARY, progress);
-        Color handle = DropdownTheme.lerp(DropdownTheme.OUTLINE, DropdownTheme.ON_PRIMARY, progress);
+        Color track = DropdownTheme.lerp(DropdownTheme.isLightTheme() ? DropdownTheme.SURFACE_CONTAINER_HIGH : DropdownTheme.SURFACE_CONTAINER_HIGHEST, DropdownTheme.PRIMARY, progress);
+        Color handle = DropdownTheme.lerp(DropdownTheme.isLightTheme() ? DropdownTheme.TEXT_SECONDARY : DropdownTheme.OUTLINE, DropdownTheme.ON_PRIMARY, progress);
         float handleTravel = toggleBounds.width() - 10.0f - handleSize;
         float handleX = toggleBounds.x() + 5.0f + handleTravel * progress;
         float handleY = toggleBounds.centerY() - handleSize / 2.0f;
 
-        roundRectRenderer.addRoundRect(toggleBounds.x(), toggleBounds.y(), toggleBounds.width(), toggleBounds.height(), toggleBounds.height() / 2.0f, track);
+        roundRectRenderer.addRoundRect(toggleBounds.x(), toggleBounds.y(), toggleBounds.width(), toggleBounds.height(), getHeaderControlRadius(), track);
         if (hoverProgress > 0.01f) {
             float haloSize = 16.0f;
             float haloX = handleX + handleSize / 2.0f - haloSize / 2.0f;
@@ -324,10 +371,7 @@ public class ModuleDetailPanel {
         float indicatorWidth = segmentWidth - 4.0f;
         float indicatorX = bindModeBounds.x() + 2.0f + (segmentWidth * progress);
 
-        roundRectRenderer.addRoundRect(bindModeBounds.x(), bindModeBounds.y(), bindModeBounds.width(), bindModeBounds.height(), 9.0f, DropdownTheme.SURFACE_CONTAINER_HIGH);
-        if (hoverProgress > 0.01f) {
-            roundRectRenderer.addRoundRect(bindModeBounds.x(), bindModeBounds.y(), bindModeBounds.width(), bindModeBounds.height(), 9.0f, DropdownTheme.withAlpha(DropdownTheme.TEXT_PRIMARY, (int) (12 * hoverProgress)));
-        }
+        drawHeaderControlSurface(bindModeBounds, hoverProgress, 0.0f);
         roundRectRenderer.addRoundRect(indicatorX, bindModeBounds.y() + 2.0f, indicatorWidth, bindModeBounds.height() - 4.0f, 7.0f, DropdownTheme.SECONDARY_CONTAINER);
 
         float toggleScale = 0.52f;
@@ -336,8 +380,9 @@ public class ModuleDetailPanel {
         float holdWidth = textRenderer.getWidth("Hold", holdScale);
         float textHeight = textRenderer.getHeight(toggleScale);
         float centerY = bindModeBounds.y() + (bindModeBounds.height() - textHeight) / 2.0f - 1.0f;
-        textRenderer.addText("Toggle", bindModeBounds.x() + (segmentWidth - toggleWidth) / 2.0f, centerY, toggleScale, DropdownTheme.lerp(DropdownTheme.ON_SECONDARY_CONTAINER, DropdownTheme.TEXT_SECONDARY, progress));
-        textRenderer.addText("Hold", bindModeBounds.x() + segmentWidth + (segmentWidth - holdWidth) / 2.0f, centerY, holdScale, DropdownTheme.lerp(DropdownTheme.TEXT_SECONDARY, DropdownTheme.ON_SECONDARY_CONTAINER, progress));
+        Color inactiveText = DropdownTheme.isLightTheme() ? DropdownTheme.TEXT_MUTED : DropdownTheme.TEXT_SECONDARY;
+        textRenderer.addText("Toggle", bindModeBounds.x() + (segmentWidth - toggleWidth) / 2.0f, centerY, toggleScale, DropdownTheme.lerp(DropdownTheme.ON_SECONDARY_CONTAINER, inactiveText, progress));
+        textRenderer.addText("Hold", bindModeBounds.x() + segmentWidth + (segmentWidth - holdWidth) / 2.0f, centerY, holdScale, DropdownTheme.lerp(inactiveText, DropdownTheme.ON_SECONDARY_CONTAINER, progress));
     }
 
     private void drawKeybindControl(Module module, int mouseX, int mouseY) {
@@ -347,13 +392,7 @@ public class ModuleDetailPanel {
         keybindFocusAnimation.run(listening ? 1.0f : 0.0f);
         float hoverProgress = keybindHoverAnimation.getValue();
         float focusProgress = keybindFocusAnimation.getValue();
-        roundRectRenderer.addRoundRect(keybindBounds.x(), keybindBounds.y(), keybindBounds.width(), keybindBounds.height(), 9.0f, DropdownTheme.lerp(DropdownTheme.SURFACE_CONTAINER_HIGH, DropdownTheme.SURFACE_CONTAINER_HIGHEST, focusProgress));
-        if (hoverProgress > 0.01f) {
-            roundRectRenderer.addRoundRect(keybindBounds.x(), keybindBounds.y(), keybindBounds.width(), keybindBounds.height(), 9.0f, DropdownTheme.withAlpha(DropdownTheme.TEXT_PRIMARY, (int) (12 * hoverProgress)));
-        }
-        if (focusProgress > 0.01f) {
-            roundRectRenderer.addRoundRect(keybindBounds.x(), keybindBounds.y(), keybindBounds.width(), keybindBounds.height(), 9.0f, DropdownTheme.withAlpha(DropdownTheme.PRIMARY, (int) (10 * focusProgress)));
-        }
+        drawHeaderControlSurface(keybindBounds, hoverProgress, focusProgress);
 
         String label = listening ? "Press key" : formatKeybind(module.getKeyBind());
         float scale = 0.52f;
@@ -390,6 +429,20 @@ public class ModuleDetailPanel {
             popupY = chipBounds.y() - popupHeight - 4.0f;
         }
         return new EnumSelectPopup(new DropdownLayout.Rect(popupX, popupY, popupWidth, popupHeight), chipBounds, enumRow.getSetting());
+    }
+
+    private ColorPickerPopup createColorPopup(ColorSettingRow colorRow, DropdownLayout.Rect rowBounds) {
+        DropdownLayout.Rect swatchBounds = colorRow.getSwatchBounds(rowBounds);
+        int channelCount = colorRow.getSetting().isAllowAlpha() ? 4 : 3;
+        float popupWidth = 156.0f;
+        float popupHeight = 58.0f + channelCount * 24.0f;
+        float popupX = Math.max(bounds.x() + DropdownTheme.PANEL_VIEWPORT_INSET, swatchBounds.right() - popupWidth);
+        float popupY = swatchBounds.bottom() + 4.0f;
+        float maxBottom = bounds.bottom() - DropdownTheme.PANEL_VIEWPORT_INSET;
+        if (popupY + popupHeight > maxBottom) {
+            popupY = swatchBounds.y() - popupHeight - 4.0f;
+        }
+        return new ColorPickerPopup(new DropdownLayout.Rect(popupX, popupY, popupWidth, popupHeight), swatchBounds, colorRow.getSetting());
     }
 
     public void flushContent() {

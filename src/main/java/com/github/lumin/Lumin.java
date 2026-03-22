@@ -80,6 +80,7 @@ import org.slf4j.Logger;
 public class Lumin {
 
     public static final String MODID = "lumin";
+    public static final String VERSION = "5.0.1"; // NeoForge咋获取mod版本号我不知道啊。。
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static int skipTicks;

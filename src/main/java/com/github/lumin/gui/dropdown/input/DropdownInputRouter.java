@@ -35,21 +35,21 @@ public class DropdownInputRouter {
 
     public boolean routeMouseReleased(MouseButtonEvent event, DropdownPopupHost popupHost, ModuleDetailPanel detailPanel) {
         if (popupHost.getActivePopup() != null) {
-            return false;
+            return popupHost.mouseReleased(event);
         }
         return detailPanel.mouseReleased(event);
     }
 
     public boolean routeMouseDragged(MouseButtonEvent event, double mouseX, double mouseY, DropdownPopupHost popupHost, ModuleDetailPanel detailPanel) {
         if (popupHost.getActivePopup() != null) {
-            return false;
+            return popupHost.mouseDragged(event, mouseX, mouseY);
         }
         return detailPanel.mouseDragged(event, mouseX, mouseY);
     }
 
     public boolean routeCharTyped(CharacterEvent event, DropdownPopupHost popupHost, ModuleDetailPanel detailPanel, ModuleListPanel moduleListPanel) {
         if (popupHost.getActivePopup() != null) {
-            return false;
+            return popupHost.charTyped(event);
         }
         if (moduleListPanel.charTyped(event)) {
             return true;

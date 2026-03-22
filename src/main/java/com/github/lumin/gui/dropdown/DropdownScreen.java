@@ -49,6 +49,7 @@ public class DropdownScreen extends Screen {
 
     @Override
     public void render(@NonNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        DropdownTheme.syncFromSettings();
         float railWidth = categoryRailPanel.getAnimatedWidth();
         DropdownLayout.Layout layout = DropdownLayout.compute(width, height, railWidth);
 
@@ -75,11 +76,10 @@ public class DropdownScreen extends Screen {
     }
 
     private void drawChrome(DropdownLayout.Layout layout) {
-        ClickGui clickGui = ClickGui.INSTANCE;
         ShadowRenderer shadowRenderer = shadowRendererSupplier.get();
         RoundRectRenderer roundRectRenderer = roundRectRendererSupplier.get();
 
-        if (clickGui.shouldBlur()) {
+        if (ClickGui.INSTANCE.shouldBlur()) {
             // 我感觉blur没必要好吧因为几乎看不到捏
             //BlurShader.INSTANCE.drawBlur(layout.panel().x(), layout.panel().y(), layout.panel().width(), layout.panel().height(), DropdownTheme.PANEL_RADIUS, clickGui.getBlurStrength());
         }
@@ -98,6 +98,11 @@ public class DropdownScreen extends Screen {
         double mouseY = event.y();
         if (event.button() != 0) {
             return super.mouseClicked(event, isDoubleClick);
+        }
+
+        if (popupHost.getActivePopup() != null) {
+            return inputRouter.routeMouseClicked(event, isDoubleClick, popupHost, moduleDetailPanel, moduleListPanel, categoryRailPanel)
+                    || super.mouseClicked(event, isDoubleClick);
         }
 
         DropdownLayout.Layout layout = DropdownLayout.compute(width, height, categoryRailPanel.getAnimatedWidth());

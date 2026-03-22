@@ -13,6 +13,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.util.Mth;
+
+import java.awt.*;
 
 public class IntSettingRow extends SettingRow<IntSetting> {
 
@@ -83,17 +86,26 @@ public class IntSettingRow extends SettingRow<IntSetting> {
             textRenderer.addText(label, textX, textY, textScale, DropdownTheme.withAlpha(DropdownTheme.INVERSE_ON_SURFACE, bubbleAlpha));
         }
 
-        roundRectRenderer.addRoundRect(fieldBounds.x(), fieldBounds.y(), fieldBounds.width(), fieldBounds.height(), 7.0f, focused ? DropdownTheme.SURFACE_CONTAINER_HIGHEST : DropdownTheme.SURFACE_CONTAINER_LOW);
+        Color fieldBase = DropdownTheme.isLightTheme() ? DropdownTheme.SURFACE_CONTAINER : DropdownTheme.SURFACE_CONTAINER_LOW;
+        Color fieldHover = DropdownTheme.isLightTheme() ? DropdownTheme.SURFACE_CONTAINER_HIGHEST : DropdownTheme.SURFACE_CONTAINER_HIGHEST;
+        Color fieldColor = focused
+                ? DropdownTheme.INVERSE_SURFACE
+                : DropdownTheme.lerp(fieldBase, fieldHover, animatedHover * 0.85f);
+        Color fieldTextColor = focused ? DropdownTheme.INVERSE_ON_SURFACE : DropdownTheme.TEXT_PRIMARY;
+        roundRectRenderer.addRoundRect(fieldBounds.x(), fieldBounds.y(), fieldBounds.width(), fieldBounds.height(), 7.0f, fieldColor);
+        if (focused) {
+            rectRenderer.addRect(fieldBounds.x() + 5.0f, fieldBounds.bottom() - 2.0f, fieldBounds.width() - 10.0f, 1.5f, DropdownTheme.PRIMARY);
+        }
         String display = focused ? getDisplayBuffer() : formatValue();
         float displayScale = 0.60f;
         float textWidth = textRenderer.getWidth(display, displayScale);
         float textHeight = textRenderer.getHeight(displayScale);
         float textX = fieldBounds.x() + (fieldBounds.width() - textWidth) / 2.0f;
         float textY = fieldBounds.y() + (fieldBounds.height() - textHeight) / 2.0f - 1.0f;
-        textRenderer.addText(display, textX, textY, displayScale, DropdownTheme.TEXT_PRIMARY);
+        textRenderer.addText(display, textX, textY, displayScale, fieldTextColor);
         if (focused) {
             float caretX = textX + textRenderer.getWidth(display.substring(0, Math.min(cursorIndex, display.length())), displayScale);
-            rectRenderer.addRect(caretX, fieldBounds.y() + 4.0f, 1.0f, fieldBounds.height() - 8.0f, DropdownTheme.TEXT_PRIMARY);
+            rectRenderer.addRect(caretX, fieldBounds.y() + 4.0f, 1.0f, fieldBounds.height() - 8.0f, DropdownTheme.INVERSE_ON_SURFACE);
         }
     }
 
@@ -240,13 +252,16 @@ public class IntSettingRow extends SettingRow<IntSetting> {
         int step = Math.max(1, setting.getStep());
         int range = setting.getMax() - setting.getMin();
         int steps = Math.max(1, range / step);
+        float dotSize = 1.5f;
         for (int i = 0; i <= steps; i++) {
             float stepProgress = i / (float) steps;
             if (Math.abs(stepProgress - progress) < (1.0f / steps) * 0.5f) {
                 continue;
             }
-            float x = trackBounds.x() + trackBounds.width() * stepProgress;
-            rectRenderer.addRect(x, trackBounds.centerY() - 1.0f, 2.0f, 2.0f, stepProgress <= progress ? DropdownTheme.ON_PRIMARY : DropdownTheme.ON_SECONDARY_CONTAINER);
+            float x = trackBounds.x() + trackBounds.width() * stepProgress - dotSize / 2.0f;
+            x = Mth.clamp(x, trackBounds.x(), trackBounds.right() - dotSize);
+            float y = trackBounds.centerY() - dotSize / 2.0f;
+            rectRenderer.addRect(x, y, dotSize, dotSize, stepProgress <= progress ? DropdownTheme.ON_PRIMARY : DropdownTheme.ON_SECONDARY_CONTAINER);
         }
     }
 

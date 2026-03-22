@@ -21,9 +21,21 @@ public class ColorSettingRow extends SettingRow<ColorSetting> {
         float labelY = bounds.y() + (bounds.height() - textRenderer.getHeight(labelScale)) / 2.0f - 1.0f;
         roundRectRenderer.addRoundRect(bounds.x(), bounds.y(), bounds.width(), bounds.height(), DropdownTheme.CARD_RADIUS, DropdownTheme.lerp(DropdownTheme.SURFACE_CONTAINER, DropdownTheme.SURFACE_CONTAINER_HIGH, hoverProgress));
         textRenderer.addText(setting.getDisplayName(), bounds.x() + DropdownTheme.ROW_CONTENT_INSET, labelY, labelScale, DropdownTheme.TEXT_PRIMARY);
+        DropdownLayout.Rect swatchBounds = getSwatchBounds(bounds);
+        roundRectRenderer.addRoundRect(swatchBounds.x(), swatchBounds.y(), swatchBounds.width(), swatchBounds.height(), 5.0f, DropdownTheme.SURFACE_CONTAINER_HIGHEST);
+        roundRectRenderer.addRoundRect(swatchBounds.x(), swatchBounds.y(), swatchBounds.width(), swatchBounds.height(), 5.0f, setting.getValue());
+        roundRectRenderer.addRoundRect(swatchBounds.x(), swatchBounds.y(), swatchBounds.width(), swatchBounds.height(), 5.0f, DropdownTheme.withAlpha(DropdownTheme.OUTLINE_SOFT, 58));
+    }
+
+    public DropdownLayout.Rect getSwatchBounds(DropdownLayout.Rect bounds) {
         float swatchX = bounds.right() - DropdownTheme.ROW_TRAILING_INSET - 12.0f;
         float swatchY = bounds.y() + (bounds.height() - 12.0f) / 2.0f;
-        roundRectRenderer.addRoundRect(swatchX, swatchY, 12.0f, 12.0f, 5.0f, setting.getValue());
-        rectRenderer.addRect(swatchX, swatchY + 13.0f, 12.0f, 1.0f, DropdownTheme.OUTLINE_SOFT);
+        return new DropdownLayout.Rect(swatchX, swatchY, 12.0f, 12.0f);
     }
+
+    @Override
+    public boolean mouseClicked(DropdownLayout.Rect bounds, net.minecraft.client.input.MouseButtonEvent event, boolean isDoubleClick) {
+        return event.button() == 0 && bounds.contains(event.x(), event.y());
+    }
+
 }

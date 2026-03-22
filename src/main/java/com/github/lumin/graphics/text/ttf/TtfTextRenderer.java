@@ -105,11 +105,8 @@ public class TtfTextRenderer implements ITextRenderer {
 
         if (ttfInfoUniformBuf == null) {
             final var size = new Std140SizeCalculator().putFloat().get();
-            ttfInfoUniformBuf = RenderSystem.getDevice().createBuffer(
-                    () -> "Lumin TTF UBO", GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_MAP_WRITE, size);
-
-            try (GpuBuffer.MappedView mappedView = RenderSystem.getDevice().createCommandEncoder()
-                    .mapBuffer(ttfInfoUniformBuf, false, true)) {
+            ttfInfoUniformBuf = RenderSystem.getDevice().createBuffer(() -> "Lumin TTF UBO", GpuBuffer.USAGE_UNIFORM | GpuBuffer.USAGE_MAP_WRITE, size);
+            try (GpuBuffer.MappedView mappedView = RenderSystem.getDevice().createCommandEncoder().mapBuffer(ttfInfoUniformBuf, false, true)) {
                 Std140Builder.intoBuffer(mappedView.data()).putFloat(0.5f);
             }
         }

@@ -41,7 +41,7 @@ public class ModuleRow {
         float keyScale = 0.6f;
         float titleHeight = textRenderer.getHeight(titleScale, StaticFontLoader.DUCKSANS);
         float subHeight = textRenderer.getHeight(subScale);
-        float lineGap = 2.0f;
+        float lineGap = 3.0f;
         float totalTextHeight = titleHeight + lineGap + subHeight;
         float titleY = bounds.y() + (bounds.height() - totalTextHeight) / 2.0f - 1.0f;
         float subY = titleY + titleHeight + lineGap - 1.0f;
@@ -50,15 +50,10 @@ public class ModuleRow {
         Color background = DropdownTheme.lerp(hoverBackground, DropdownTheme.PRIMARY_CONTAINER, selectedProgress);
         Color titleColor = DropdownTheme.lerp(DropdownTheme.TEXT_PRIMARY, DropdownTheme.ON_PRIMARY_CONTAINER, selectedProgress);
         Color subColor = DropdownTheme.lerp(DropdownTheme.TEXT_SECONDARY, DropdownTheme.withAlpha(DropdownTheme.ON_PRIMARY_CONTAINER, 180), selectedProgress);
+        Color keyColor = DropdownTheme.isLightTheme() ? DropdownTheme.TEXT_SECONDARY : DropdownTheme.TEXT_MUTED;
         String keybindText = formatKeybind(module.module().getKeyBind());
         float keyWidth = textRenderer.getWidth(keybindText, keyScale);
-        String stateIcon = module.enabled() ? "V" : "X";
-        float stateIconScale = 1.0f;
-        float stateIconWidth = textRenderer.getWidth(stateIcon, stateIconScale, StaticFontLoader.ICONS);
-        float iconGap = 10.0f;
-        float keyX = getToggleBounds().x() - 8.0f - stateIconWidth - iconGap - keyWidth;
-        float stateIconY = bounds.y() + (bounds.height() - textRenderer.getHeight(stateIconScale, StaticFontLoader.ICONS)) / 2.0f - 1.0f;
-        Color keyColor = DropdownTheme.TEXT_MUTED;
+        float keyX = getToggleBounds().x() - 8.0f - keyWidth;
 
         roundRectRenderer.addRoundRect(bounds.x(), bounds.y(), bounds.width(), bounds.height(), DropdownTheme.CARD_RADIUS, background);
 
@@ -66,12 +61,13 @@ public class ModuleRow {
         textRenderer.addText(module.category().getName(), bounds.x() + DropdownTheme.ROW_CONTENT_INSET + 4.0f, subY, subScale, subColor);
         drawSwitch(roundRectRenderer, getToggleBounds(), toggleProgress, toggleHoverProgress);
         textRenderer.addText(keybindText, keyX, keyY, keyScale, keyColor);
-        textRenderer.addText(stateIcon, keyX + keyWidth + iconGap, stateIconY, stateIconScale, keyColor, StaticFontLoader.ICONS);
     }
 
     private void drawSwitch(RoundRectRenderer roundRectRenderer, DropdownLayout.Rect rect, float toggleProgress, float toggleHoverProgress) {
-        Color track = DropdownTheme.lerp(DropdownTheme.SURFACE_CONTAINER_HIGHEST, DropdownTheme.PRIMARY, toggleProgress);
-        Color knob = DropdownTheme.lerp(DropdownTheme.OUTLINE, DropdownTheme.ON_PRIMARY_CONTAINER, toggleProgress);
+        Color trackBase = DropdownTheme.isLightTheme() ? DropdownTheme.SURFACE_CONTAINER_HIGH : DropdownTheme.SURFACE_CONTAINER_HIGHEST;
+        Color knobBase = DropdownTheme.isLightTheme() ? DropdownTheme.TEXT_SECONDARY : DropdownTheme.OUTLINE;
+        Color track = DropdownTheme.lerp(trackBase, DropdownTheme.PRIMARY, toggleProgress);
+        Color knob = DropdownTheme.lerp(knobBase, DropdownTheme.ON_PRIMARY_CONTAINER, toggleProgress);
         float knobSize = 8.0f + 3.0f * toggleProgress;
         float knobTravel = rect.width() - 10.0f - knobSize;
         float knobX = rect.x() + 5.0f + knobTravel * toggleProgress;

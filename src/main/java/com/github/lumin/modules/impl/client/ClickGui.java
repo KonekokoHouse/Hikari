@@ -4,10 +4,26 @@ import com.github.lumin.gui.dropdown.DropdownScreen;
 import com.github.lumin.modules.Category;
 import com.github.lumin.modules.Module;
 import com.github.lumin.settings.impl.BoolSetting;
-import com.github.lumin.settings.impl.DoubleSetting;
 import com.github.lumin.settings.impl.EnumSetting;
 
 public class ClickGui extends Module {
+
+    public enum ThemePreset {
+        TonalSpot,
+        Neutral,
+        Vibrant,
+        Expressive,
+        Fidelity,
+        Content,
+        Rainbow,
+        FruitSalad,
+        Monochrome
+    }
+
+    public enum ThemeMode {
+        Dark,
+        Light
+    }
 
     public static final ClickGui INSTANCE = new ClickGui();
 
@@ -15,15 +31,9 @@ public class ClickGui extends Module {
         super("ClickGui", Category.CLIENT);
     }
 
-    private enum BlurMode {
-        FullScreen,
-        OnlyCategory,
-    }
-
-    public final DoubleSetting scale = doubleSetting("Scale", 1.0, 0.5, 2.0, 0.05);
     private final BoolSetting backgroundBlur = boolSetting("BackgroundBlur", true);
-    private final DoubleSetting blurStrength = doubleSetting("BlurStrength", 5, 1.0, 15, 0.5, backgroundBlur::getValue);
-    private final EnumSetting<BlurMode> blurMode = enumSetting("BlurMode", BlurMode.OnlyCategory, backgroundBlur::getValue);
+    public final EnumSetting<ThemeMode> themeMode = enumSetting("ThemeMode", ThemeMode.Dark);
+    public final EnumSetting<ThemePreset> themePreset = enumSetting("ThemePreset", ThemePreset.TonalSpot);
 
     @Override
     protected void onEnable() {
@@ -42,16 +52,12 @@ public class ClickGui extends Module {
         return backgroundBlur.getValue();
     }
 
-    public boolean isFullScreenBlur() {
-        return shouldBlur() && blurMode.is(BlurMode.FullScreen);
+    public ThemePreset getThemePreset() {
+        return themePreset.getValue();
     }
 
-    public boolean isCategoryBlur() {
-        return shouldBlur() && blurMode.is(BlurMode.OnlyCategory);
-    }
-
-    public float getBlurStrength() {
-        return blurStrength.getValue().floatValue();
+    public ThemeMode getThemeMode() {
+        return themeMode.getValue();
     }
 
 }
